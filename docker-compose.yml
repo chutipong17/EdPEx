@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+
+    container_name: edpex-sqlserver
+
+    restart: always
+
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
+
+    ports:
+      - "${DB_PORT}:1433"
+
+    volumes:
+      - sqlserver_prod:/var/opt/mssql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: edpex-web
+
+    restart: always
+
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "${DATABASE_URL}"
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - sqlserver
+
+volumes:
+  sqlserver_prod:

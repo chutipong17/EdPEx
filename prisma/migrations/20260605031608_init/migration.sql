@@ -1,0 +1,24 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[health_check] (
+    [id] INT NOT NULL,
+    [status] VARCHAR(255) NOT NULL,
+    CONSTRAINT [health_check_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [health_check_id_key] UNIQUE NONCLUSTERED ([id])
+);
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
