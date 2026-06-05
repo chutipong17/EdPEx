@@ -1,5 +1,3 @@
-// import { PrismaClient, Prisma } from "@prisma/client";
-// import { PrismaClient, Prisma } from "./generated/prisma/client";
 import { PrismaClient, Prisma } from "@prisma/client";
 import healthcheck from "./data/health-check.json";
 
