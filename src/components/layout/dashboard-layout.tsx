@@ -1,0 +1,50 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { Header } from './header'
+import { Sidebar, SidebarMobileContent } from './sidebar'
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [activeKey, setActiveKey] = useState('dashboard')
+
+  // Collapse sidebar automatically on laptop widths (1024px – 1279px)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px) and (max-width: 1279px)')
+    const apply = () => setCollapsed(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  const handleNavigate = (key: string) => {
+    setActiveKey(key)
+    setMobileOpen(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Sidebar collapsed={collapsed} activeKey={activeKey} onNavigate={handleNavigate} />
+
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-[260px] p-0">
+          <SheetTitle className="sr-only">เมนูนำทาง</SheetTitle>
+          <SidebarMobileContent activeKey={activeKey} onNavigate={handleNavigate} />
+        </SheetContent>
+      </Sheet>
+
+      <div
+        className={
+          collapsed
+            ? 'lg:pl-20 transition-[padding] duration-200'
+            : 'lg:pl-[260px] transition-[padding] duration-200'
+        }
+      >
+        <Header onMenuClick={() => setMobileOpen(true)} />
+        <main className="mx-auto w-full max-w-[1800px] p-3 md:p-6">{children}</main>
+      </div>
+    </div>
+  )
+}
