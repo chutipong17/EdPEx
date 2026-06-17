@@ -6,6 +6,7 @@ import type {
   KpiSummary,
   PieDatum,
 } from '@/types/dashboard'
+import type { IndicatorGraph, IndicatorDataPoint } from "@/types/indicator-graph"
 
 export const kpiSummary: KpiSummary = {
   total: 50,
@@ -124,3 +125,74 @@ export const indicators: Indicator[] = Array.from({ length: 50 }, (_, i) => {
     status: statusFromValues(result, target),
   }
 })
+
+
+/// กราฟผลลัพธ์
+
+
+const YEARS = ["2566", "2567", "2568"] as const
+
+
+function makeData(seed: number): IndicatorDataPoint[] {
+  // Deterministic pseudo-random values so the dashboard renders consistently.
+  return YEARS.map((year, i) => {
+    const base = ((seed + i * 7) % 5) + 1
+    return {
+      year,
+      ubru: Math.min(5, base + 1),
+      target: 5,
+      q1: Math.max(1, base),
+      q2: Math.max(1, base - 1 - (i % 2)),
+    }
+  })
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  "7.1": "ผลลัพธ์ด้านการเรียนรู้ของผู้เรียน",
+  "7.2": "ผลลัพธ์ด้านการมุ่งเน้นลูกค้า",
+  "7.3": "ผลลัพธ์ด้านการมุ่งเน้นบุคลากร",
+  "7.4": "ผลลัพธ์ด้านการนำองค์กรและธรรมาภิบาล",
+  "7.5": "ผลลัพธ์ด้านงบประมาณ การเงิน และตลาด",
+}
+
+export const CATEGORIES = Object.entries(CATEGORY_LABELS).map(
+  ([value, label]) => ({ value, label: `${value} ${label}` }),
+)
+
+export const YEAR_OPTIONS = YEARS.map((y) => ({ value: y, label: y }))
+
+export const CHART_TYPE_OPTIONS = [
+  { value: "composed", label: "กราฟแท่งและเส้น" },
+  { value: "bar", label: "กราฟแท่ง" },
+  { value: "line", label: "กราฟเส้น" },
+]
+
+const descriptions = [
+  "ร้อยละความพึงพอใจของผู้เรียนต่อหลักสูตร",
+  "อัตราการสำเร็จการศึกษาตามระยะเวลา",
+  "ระดับผลการประเมินตามเกณฑ์คุณภาพ",
+  "จำนวนผลงานที่ได้รับการเผยแพร่ระดับชาติ",
+  "ค่าเฉลี่ยคะแนนการประเมินสมรรถนะ",
+  "ร้อยละการบรรลุเป้าหมายตามแผนปฏิบัติการ",
+]
+
+export const indicatorsGraph: IndicatorGraph[] = Array.from({ length: 18 }, (_, idx) => {
+  const categoryKeys = Object.keys(CATEGORY_LABELS)
+  const category = categoryKeys[idx % categoryKeys.length]
+  const sub = (idx % 4) + 1
+  const num = String((idx % 9) + 1).padStart(2, "0")
+  return {
+    id: `ind-${idx + 1}`,
+    code: `ตัวชี้วัด ${category}(${sub})-${num}`,
+    description: descriptions[idx % descriptions.length],
+    category: category as  IndicatorGraph["category"],
+    data: makeData(idx + 1),
+  }
+})
+
+export const SERIES = [
+  { key: "ubru", label: "UBRU", color: "var(--chart-1)", type: "bar" as const },
+  { key: "target", label: "เป้าหมาย", color: "var(--chart-2)", type: "line" as const },
+  { key: "q1", label: "ครั้งที่ 1", color: "var(--chart-3)", type: "bar" as const },
+  { key: "q2", label: "ครั้งที่ 2", color: "var(--chart-4)", type: "bar" as const },
+]

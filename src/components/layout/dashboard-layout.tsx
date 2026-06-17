@@ -24,6 +24,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     setMobileOpen(false)
   }
 
+  function toggleSidebar() {
+    // On large screens toggle collapse; on small screens open the drawer.
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      setCollapsed((c) => !c)
+    } else {
+      setMobileOpen((o) => !o)
+    }
+  }
+
+
   return (
     <div className="min-h-screen bg-background">
       <Sidebar collapsed={collapsed} activeKey={activeKey} onNavigate={handleNavigate} />
@@ -42,7 +52,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             : 'lg:pl-[260px] transition-[padding] duration-200'
         }
       >
-        <Header onMenuClick={() => setMobileOpen(true)} />
+         <Header onToggleSidebar={toggleSidebar} />
+        {/* <Header onMenuClick={() => setMobileOpen(true)} /> */}
         <main className="mx-auto w-full max-w-[1800px] p-3 md:p-6">{children}</main>
       </div>
     </div>

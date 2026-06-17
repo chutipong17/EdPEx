@@ -40,8 +40,8 @@ interface FieldProps {
 
 function SelectField({ name, label, options, control }: FieldProps) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={name} className="text-xs text-muted-foreground widt">
+    <div className="flex flex-col gap-1.5 w-full max-w-md">
+      <Label htmlFor={name} className="text-xs text-muted-foreground width">
         {label}
       </Label>
       <Controller
@@ -49,7 +49,7 @@ function SelectField({ name, label, options, control }: FieldProps) {
         name={name}
         render={({ field }) => (
           <Select value={field.value} onValueChange={(v) => field.onChange(v ?? 'all')}>
-            <SelectTrigger id={name} className="h-10 rounded-lg" aria-label={label}>
+            <SelectTrigger id={name} className="h-10 rounded-lg w-full" aria-label={label}>
               <SelectValue placeholder={label} />
             </SelectTrigger>
             <SelectContent>
