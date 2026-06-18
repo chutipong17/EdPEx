@@ -17,6 +17,11 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           size="icon"
           onClick={onToggleSidebar}
           aria-label="สลับการแสดงเมนู"
+          className=" hover:bg-transparent
+    hover:text-inherit
+    focus:bg-transparent
+    active:bg-transparent
+    shadow-none"
         >
           <Menu className="size-5" aria-hidden="true" />
         </Button>
@@ -26,10 +31,13 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-foreground">ADMIN</span>
-        <Avatar className="size-9">
-          <AvatarFallback className="bg-secondary text-primary">
-            <User className="size-5" aria-hidden="true" />
+        <div className="hidden text-right leading-tight sm:block">
+          <p className="text-sm font-semibold">ADMIN</p>
+          <p className="text-xs text-muted-foreground">ผู้ดูแลระบบ</p>
+        </div>
+        <Avatar className="size-9 border">
+          <AvatarFallback className="bg-accent text-sm font-semibold text-primary">
+            AD
           </AvatarFallback>
         </Avatar>
       </div>

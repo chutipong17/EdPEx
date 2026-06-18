@@ -13,11 +13,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'EdPEx | มรภ.อุบลราชธานี',
+  title: "EdPEx | มรภ.อุบลราชธานี",
   description:
-    'ระบบแสดงผลลัพธ์ตัวชี้วัดตามเกณฑ์คุณภาพการศึกษาเพื่อการดำเนินการที่เป็นเลิศ (EdPEx)',
-  generator: 'v0.app',
-}
+    "ระบบแสดงผลลัพธ์ตัวชี้วัดตามเกณฑ์คุณภาพการศึกษาเพื่อการดำเนินการที่เป็นเลิศ (EdPEx)",
+  generator: "v0.app",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#FF1493",
+};
 
 export default function RootLayout({
   children,
@@ -26,17 +31,16 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="th"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col"
+      >
+        {children}
+      </body>
     </html>
   );
-}
-
-
-
-export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#FF1493',
 }
