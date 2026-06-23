@@ -1,0 +1,6 @@
+[
+  { "id": 1, "permissionCode": "CAN_CREATE", "permissionName": "Create KPI" },
+  { "id": 2, "permissionCode": "CAN_VIEW", "permissionName": "View Dashboard" },
+  { "id": 3, "permissionCode": "CAN_UPDATE", "permissionName": "Update KPI" },
+  { "id": 4, "permissionCode": "CAN_DELETE", "permissionName": "Delete KPI" }
+]

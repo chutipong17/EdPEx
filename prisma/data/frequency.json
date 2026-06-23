@@ -1,0 +1,4 @@
+[
+  { "id": 1, "frequencyName": "ปีปฏิทิน", "isDeleted": false, "createdBy": "system", "updatedBy": "system" },
+  { "id": 2, "frequencyName": "ปีการศึกษา", "isDeleted": false, "createdBy": "system", "updatedBy": "system" }
+]
