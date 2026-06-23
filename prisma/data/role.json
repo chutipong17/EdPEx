@@ -1,0 +1,5 @@
+[
+  { "id": 1, "roleCode": "ADMIN", "roleNameEn": "Admin", "roleNameTH": "ผู้ดูแลระบบ" },
+  { "id": 2, "roleCode": "USER", "roleNameEn": "User", "roleNameTH": "ผู้ใช้งาน" },
+  { "id": 3, "roleCode": "EXECUTIVE", "roleNameEn": "Executive", "roleNameTH": "ผู้บริหาร" }
+]

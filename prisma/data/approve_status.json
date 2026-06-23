@@ -1,0 +1,5 @@
+[
+  { "id": 1, "statusName": "ไม่มีข้อมูล", "value": "NO_DATA" },
+  { "id": 2, "statusName": "ไม่บรรลุเป้าหมาย", "value": "UNDER_TARGET" },
+  { "id": 3, "statusName": "บรรลุเป้าหมาย", "value": "TARGET_ACHIEVED" }
+]
