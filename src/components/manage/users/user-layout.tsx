@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { Header } from './header'
-import { Sidebar, SidebarMobileContent } from './sidebar'
+import { Header } from '@/components/layout/header'
+import { Sidebar, SidebarMobileContent } from '@/components/layout/sidebar'
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function UserLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [activeKey, setActiveKey] = useState('dashboard')
+  const [activeKey, setActiveKey] = useState('manage-users')
 
   // Collapse sidebar automatically on laptop widths (1024px – 1279px)
   useEffect(() => {

@@ -67,10 +67,10 @@ function MiniSelect({
 }) {
   const [value, setValue] = useState(options[0]?.value ?? '')
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5 w-full max-w-md">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       <Select value={value} onValueChange={(v) => setValue(v ?? '')}>
-        <SelectTrigger className="h-10 rounded-lg" aria-label={label}>
+        <SelectTrigger className="h-10 rounded-lg w-full" aria-label={label}>
           <SelectValue placeholder={label} />
         </SelectTrigger>
         <SelectContent>
