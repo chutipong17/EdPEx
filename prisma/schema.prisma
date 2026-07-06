@@ -46,10 +46,15 @@ model Role {
 }
 
 model RolePermission {
-  id           Int @id @unique @map("id") @db.Int
+  id           Int @id @unique @default(autoincrement()) @map("id") @db.Int
   roleId       Int @map("role_id")
   permissionId Int @map("permission_id")
   userId       Int @map("user_id")
+  isDeleted    Boolean   @default(false) @map("is_deleted")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+  createdBy    String    @map("created_by") @db.NVarChar(255)
+  updatedBy    String?   @map("updated_by") @db.NVarChar(255)
 
   role         Role @relation(fields: [roleId], references: [id])
   permission   Permission @relation(fields: [permissionId], references: [id])
@@ -218,9 +223,9 @@ model User {
   id           Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   departmentId Int       @map("department_id")
   firstName    String    @map("first_name") @db.NVarChar(255)
-  lastName     String    @map("last_name")  @db.NVarChar(255)
+  lastName     String?   @map("last_name")  @db.NVarChar(255)
   email        String    @map("email")      @db.VarChar(255)
-  mobileNumber String    @map("mobile_number") @db.VarChar(20)
+  mobileNumber String?   @map("mobile_number") @db.VarChar(20)
   isActive     Boolean   @default(false) @map("is_active")
   isDeleted    Boolean   @default(false) @map("is_deleted")
   createdAt    DateTime  @default(now()) @map("created_at")
@@ -264,7 +269,7 @@ model Auth {
 
 model RefreshToken {
   id         Int       @id @unique @default(autoincrement()) @map("id") @db.Int
-  userId     Int       @map("user_id")
+  userId     Int       @unique @map("user_id")
   token      String    @map("token")
   expiryDate DateTime  @map("expiry_date")
   isDeleted  Boolean   @default(false) @map("is_deleted")
