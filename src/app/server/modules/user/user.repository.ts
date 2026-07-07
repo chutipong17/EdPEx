@@ -1,14 +1,19 @@
 import prismaInstance from "@/app/server/config/prismaClientInstance";
-import { HTTPException } from "hono/http-exception";
 import { customLog } from "@/app/server/util/custom-log";
 import { Prisma, User } from "@prisma/client";
+import { HTTPException } from "hono/http-exception";
 
 export class UserRepository {
   private readonly prisma = prismaInstance;
 
-  async getUser(): Promise<User> {
+  async getUserById(userId: number): Promise<User | null> {
     try {
-      return {} as User;
+      return await this.prisma.user.findUnique({
+        where: { 
+          id: userId, 
+          isDeleted: false 
+        },
+      });
     } catch (error) {
       customLog.error("Error fetching user", { error });
       throw new HTTPException(400, { message: "Failed to fetch user" });
@@ -28,7 +33,7 @@ export class UserRepository {
 
   async findUserById(id: number): Promise<User | null> {
     try {
-      return await this.prisma.user.findFirst({
+      return await this.prisma.user.findUnique({
         where: { id },
       });
     } catch (error) {

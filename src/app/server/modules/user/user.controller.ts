@@ -7,9 +7,10 @@ export class UserController {
     private readonly userService = new UserService()
   ) {}
 
-  getUser = async (c: Context) => {
+  getUserById = async (c: Context) => {
     try {
-      const user = await this.userService.getUser();
+      const userId = c.req.param("id");
+      const user = await this.userService.getUserById(Number(userId));
 
       return c.json({
         success: true,

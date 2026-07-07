@@ -7,6 +7,8 @@ const JWT_EXPIRES_IN =
 export interface JwtPayload {
   sub: string;
   email: string;
+  roleId: number;
+  fullName: string;
 }
 
 export const signAccessToken = (payload: JwtPayload) => {
