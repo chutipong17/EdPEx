@@ -35,6 +35,7 @@ import frequencyRouter from "./modules/frequency/frequency.route";
 import approveStatusRouter from "./modules/approve-status/approve-status.route";
 import authRouter from "./modules/auth/auth.route";
 import userRouter from "./modules/user/user.route";
+import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
 
 export const runtime = "node";
 
@@ -116,6 +117,7 @@ app.route("/frequency", frequencyRouter);
 app.route("/approve-status", approveStatusRouter);
 app.route("/auth", authRouter);
 app.route("/user", userRouter);
+app.route("/kpi-category", kpiCategoryRouter);
 
 // Serve OpenAPI JSON
 // app.doc("/swagger/json", {
