@@ -1,7 +1,7 @@
+import { PrismaClient } from "@prisma/client";
 import { Context, Next } from "hono";
 import * as jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import { convertBigIntToString } from "../util/common";
+import { verifyAccessToken } from "../config/jwt";
 import { customLog } from "../util/custom-log";
 
 const prisma = new PrismaClient();
@@ -31,10 +31,11 @@ export const authGuard = async (c: Context, next: Next) => {
     return c.json({ error: "Unauthorized - No token provided" }, 401);
   }
 
-  const JWT_SECRET = process.env.JWT_SECRET ?? "your-jwt-secret-key-for-development-only";
+  // const JWT_SECRET = process.env.JWT_SECRET ?? "your-jwt-secret-key-for-development-only";
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+    // const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+    const payload = verifyAccessToken(token);
 
     if (!payload.sub) {
       return c.json({ error: "Unauthorized - Invalid token" }, 401);
@@ -62,7 +63,13 @@ export const authGuard = async (c: Context, next: Next) => {
       return c.json({ error: "Unauthorized - User not found" }, 401);
     }
 
-    c.set("user", convertBigIntToString(user));
+    const fullName = [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(" ");
+
+    c.set("user", user);
+    c.set("userId", user.id.toString());
+    c.set("fullName", fullName);
 
     await next();
   } catch (error) {

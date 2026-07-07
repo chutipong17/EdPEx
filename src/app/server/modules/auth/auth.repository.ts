@@ -121,7 +121,6 @@ export class AuthRepository {
     password: string,
     updatedBy: string,
     userId: number,
-    isDeleted: boolean = false
   ): Promise<User | null> {
     try {
       return this.prisma.$transaction(async (tx) => {
@@ -148,7 +147,6 @@ export class AuthRepository {
           where: { id: currentAuth.id },
           data: {
             password,
-            isDeleted,
             updatedBy,
             updatedAt: new Date(),
           },
