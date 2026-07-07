@@ -1,11 +1,12 @@
 import { customLog } from "@/app/server/util/custom-log";
 import { Context } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { SignUpDto } from "../../dto/sign-up.dto";
-import { AuthService } from "./auth.service";
 import { HTTPException } from "hono/http-exception";
-import { convertErrorMessage } from "../../util/common";
+import { ChangePasswordDto } from "../../dto/change-password.dto";
 import { SignInDto } from "../../dto/sign-in.dto";
+import { SignUpDto } from "../../dto/sign-up.dto";
+import { convertErrorMessage } from "../../util/common";
+import { AuthService } from "./auth.service";
 
 export class AuthController {
   constructor(
@@ -110,6 +111,35 @@ export class AuthController {
       }, 200);
     } catch (error) {
       customLog.error("Error signing out user", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      return c.json(
+        {
+          success: false,
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+        },
+        status,
+      );
+    }
+  };
+
+  changePassword = async (c: Context, body: ChangePasswordDto) => {
+    try {
+      const token = getCookie(c, "edpex-session");
+      if (!token) {
+        return c.json({
+          success: false,
+          message: "Unauthorized",
+        }, 401);
+      }
+
+      const result = await this.authService.changePassword(body, token);
+
+      return c.json({
+        success: true,
+        data: result,
+      }, 200);
+    } catch (error) {
+      customLog.error("Error changing password", { error });
       const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {

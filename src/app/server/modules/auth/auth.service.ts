@@ -4,6 +4,7 @@ import * as argon2 from "argon2";
 import { HTTPException } from "hono/http-exception";
 import { signAccessToken, verifyAccessToken } from "../../config/jwt";
 import prismaInstance from "../../config/prismaClientInstance";
+import { ChangePasswordDto } from "../../dto/change-password.dto";
 import { SignInDto } from "../../dto/sign-in.dto";
 import { SignUpDto } from "../../dto/sign-up.dto";
 import { Permission, Role } from "../../enum/enum";
@@ -152,6 +153,8 @@ export class AuthService {
       const token = signAccessToken({
         sub: auth.userId.toString(),
         email: auth.user.email,
+        roleId: auth.user.rolePermission[0]?.roleId || 0,
+        fullName: [auth.user.firstName, auth.user.lastName].filter(Boolean).join(" "),
       });
 
       await this.authRepository.createOrUpdateRefreshToken(
@@ -181,6 +184,46 @@ export class AuthService {
       const status = error instanceof HTTPException ? error.status : 500;
       customLog.error("Error signing out user: ", { message: `${error}` || "Sign out failed" });
       throw new HTTPException(status, { message: `${error}` || "Sign out failed" });
+    }
+  }
+
+  async changePassword(request: ChangePasswordDto, token: string) {
+    try {
+      customLog.info("Changing user password");
+      if (request.password !== request.confirmPassword) {
+        customLog.error("รหัสผ่านไม่ตรงกัน");
+        throw new HTTPException(400, { message: "รหัสผ่านไม่ตรงกัน" });
+      }
+
+      // Verify and extract payload from token
+      const payload = verifyAccessToken(token);
+      customLog.info("Token payload", { payload });
+      
+      // Condition checks for payload
+      if (!payload) {
+        throw new HTTPException(401, { message: "Invalid or expired token" });
+      }
+
+      const userId = request.userId;
+      const fullName = payload.fullName;
+
+      // Hash and update new password
+      const hashedPassword = await argon2.hash(request.password, {
+        type: argon2.argon2id,
+      });
+
+      const updatedAuth = await this.authRepository.updateAuth(
+        hashedPassword,
+        fullName,
+        userId
+      );
+
+      customLog.info("Password changed successfully for user: ", { userId });
+      return updatedAuth;
+    } catch (error) {
+      const status = error instanceof HTTPException ? error.status : 500;
+      customLog.error("Error changing user password: ", { message: `${error}` || "Changing user password failed" });
+      throw new HTTPException(status, { message: `${error}` || "Changing user password failed" });
     }
   }
 }

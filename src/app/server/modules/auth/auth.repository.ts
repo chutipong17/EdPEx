@@ -1,7 +1,7 @@
 import prismaInstance from "@/app/server/config/prismaClientInstance";
-import { HTTPException } from "hono/http-exception";
 import { customLog } from "@/app/server/util/custom-log";
-import { Auth, Prisma, RefreshToken } from "@prisma/client";
+import { Auth, Prisma, RefreshToken, User } from "@prisma/client";
+import { HTTPException } from "hono/http-exception";
 
 export class AuthRepository {
   private readonly prisma = prismaInstance;
@@ -36,6 +36,11 @@ export class AuthRepository {
               updatedAt: true,
               createdBy: true,
               updatedBy: true,
+              rolePermission: {
+                select: {
+                  roleId: true,
+                },
+              }
             },
           },
         },
@@ -98,6 +103,64 @@ export class AuthRepository {
     } catch (error) {
       customLog.error("Error deleting refresh token", { error });
       throw new HTTPException(400, { message: "Failed to delete refresh token" });
+    }
+  }
+
+  async findAuthByUserId(userId: number): Promise<Auth | null> {
+    try {
+      return await this.prisma.auth.findFirst({
+        where: { userId, isDeleted: false },
+      });
+    } catch (error) {
+      customLog.error("Error fetching auth by user ID", { error });
+      throw new HTTPException(400, { message: "Failed to fetch auth by user ID" });
+    }
+  }
+
+  async updateAuth(
+    password: string,
+    updatedBy: string,
+    userId: number,
+    isDeleted: boolean = false
+  ): Promise<User | null> {
+    try {
+      return this.prisma.$transaction(async (tx) => {
+        const currentAuth = await tx.auth.findFirst({
+          where: {
+            userId,
+            isDeleted: false,
+          },
+          select: {
+            id: true,
+            username: true,
+            user: true,
+          },
+        });
+
+        if (!currentAuth) {
+          customLog.error("ไม่พบข้อมูลผู้ใช้ในระบบ : {}", { userId });
+          throw new HTTPException(404, {
+            message: "ไม่พบข้อมูลผู้ใช้ในระบบ",
+          });
+        }
+
+        const updatedUser = await tx.auth.update({
+          where: { id: currentAuth.id },
+          data: {
+            password,
+            isDeleted,
+            updatedBy,
+            updatedAt: new Date(),
+          },
+          select: {
+            user: true,
+          }
+        });
+        return updatedUser.user;
+      });
+    } catch (error) {
+      customLog.error("Error updating auth", { error });
+      throw new HTTPException(400, { message: "Failed to update auth" });
     }
   }
 }
