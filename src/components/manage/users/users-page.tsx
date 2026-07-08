@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useMemo, useState } from 'react'
-import { Search, UserPlus } from 'lucide-react'
-import { toast } from 'sonner'
+import { useMemo, useState } from "react";
+import { Search, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -14,7 +14,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination'
+} from "@/components/ui/pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,114 +24,243 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { UserTable } from './user-table'
-import { AddUserDialog } from './add-user-dialog'
-import { EditUserDialog } from './edit-user-dialog'
-import { ChangePasswordDialog } from './change-password-dialog'
-import { mockUsers } from '@/lib/mock-users'
-import type { User } from '@/types/user'
-import type {
-  AddUserValues,
-  EditUserValues,
-} from '@/lib/user-schema'
+} from "@/components/ui/alert-dialog";
+import { UserTable } from "./user-table";
+import { AddUserDialog } from "./add-user-dialog";
+import { EditUserDialog } from "./edit-user-dialog";
+import { ChangePasswordDialog } from "./change-password-dialog";
+import { mockUsers } from "@/lib/mock-users";
+import type { User } from "@/types/user";
+import type { AddUserValues, EditUserValues,ChangePasswordValues } from "@/lib/user-schema";
+import { createUser,updateUser,deleteUser,changePassword } from "@/components/serveices/authService";
+const PAGE_SIZE = 5;
 
-const PAGE_SIZE = 5
-
-function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
+function getPageNumbers(
+  current: number,
+  total: number,
+): (number | "ellipsis")[] {
   if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1)
+    return Array.from({ length: total }, (_, i) => i + 1);
   }
-  const pages: (number | 'ellipsis')[] = [1]
-  const start = Math.max(2, current - 1)
-  const end = Math.min(total - 1, current + 1)
-  if (start > 2) pages.push('ellipsis')
-  for (let i = start; i <= end; i++) pages.push(i)
-  if (end < total - 1) pages.push('ellipsis')
-  pages.push(total)
-  return pages
+  const pages: (number | "ellipsis")[] = [1];
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  if (start > 2) pages.push("ellipsis");
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (end < total - 1) pages.push("ellipsis");
+  pages.push(total);
+  return pages;
 }
 
 export function UsersPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers)
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
+  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
-  const [addOpen, setAddOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [passwordOpen, setPasswordOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [activeUser, setActiveUser] = useState<User | null>(null)
- 
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [activeUser, setActiveUser] = useState<User | null>(null);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return users
+    const q = search.trim().toLowerCase();
+    if (!q) return users;
     return users.filter((u) =>
       [u.username, u.fullname, u.email, u.department, u.phone]
-        .join(' ')
+        .join(" ")
         .toLowerCase()
-        .includes(q)
-    )
-  }, [users, search])
+        .includes(q),
+    );
+  }, [users, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const startIndex = (currentPage - 1) * PAGE_SIZE
-  const pageUsers = filtered.slice(startIndex, startIndex + PAGE_SIZE)
-  const pageNumbers = getPageNumbers(currentPage, totalPages)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const pageUsers = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+  const pageNumbers = getPageNumbers(currentPage, totalPages);
 
   function handleSearch(value: string) {
-    setSearch(value)
-    setPage(1)
+    setSearch(value);
+    setPage(1);
   }
 
-  function handleAdd(values: AddUserValues) {
-    const newUser: User = {
-      id: Math.max(0, ...users.map((u) => u.id)) + 1,
-      username: values.username,
-      fullname: values.fullname,
-      email: values.email,
-      department: values.department,
-      phone: values.phone,
-      role: values.role,
-    }
-    setUsers((prev) => [newUser, ...prev])
+  async function handleAdd(
+  values: AddUserValues
+): Promise<void> {
+  try {
+    // 1. call API
+    const user = await createUser(values)
+
+    // 2. update state จาก API response (ดีที่สุด)
+    setUsers((prev) => [user, ...prev])
+
     toast.success('เพิ่มผู้ใช้งานสำเร็จ', {
-      description: `เพิ่ม ${values.fullname} เข้าสู่ระบบแล้ว`,
+      description: `เพิ่ม ${user.fullname} เข้าสู่ระบบแล้ว`,
     })
-  }
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : 'ไม่สามารถเพิ่มผู้ใช้งานได้'
+    )
 
-  function handleEdit(values: EditUserValues) {
-    if (!activeUser) return
+    throw error
+  }
+}
+// async function handleAdd(
+//   values: AddUserValues
+// ): Promise<void> {
+//   try {
+//     // await registerUser(values)
+
+//     const newUser: User = {
+//       id: Math.max(0, ...users.map((u) => u.id)) + 1,
+//       username: values.username,
+//       fullname: values.fullname,
+//       email: values.email,
+//       department: values.department,
+//       phone: values.phone,
+//       role: values.role,
+//     }
+
+//     setUsers((prev) => [newUser, ...prev])
+
+//     toast.success('เพิ่มผู้ใช้งานสำเร็จ', {
+//       description: `เพิ่ม ${values.fullname} เข้าสู่ระบบแล้ว`,
+//     })
+//   } catch (error) {
+//     toast.error('ไม่สามารถเพิ่มผู้ใช้งานได้')
+//     throw error
+//   }
+// }
+
+//  async function handleAdd(values: AddUserValues) {
+//     const newUser: User = {
+//       id: Math.max(0, ...users.map((u) => u.id)) + 1,
+//       username: values.username,
+//       fullname: values.fullname,
+//       email: values.email,
+//       department: values.department,
+//       phone: values.phone,
+//       role: values.role,
+//     };
+//     setUsers((prev) => [newUser, ...prev]);
+//     toast.success("เพิ่มผู้ใช้งานสำเร็จ", {
+//       description: `เพิ่ม ${values.fullname} เข้าสู่ระบบแล้ว`,
+//     });
+//   }
+
+  // function handleEdit(values: EditUserValues) {
+  //   if (!activeUser) return;
+  //   setUsers((prev) =>
+  //     prev.map((u) => (u.id === activeUser.id ? { ...u, ...values } : u)),
+  //   );
+  //   toast.success("บันทึกการแก้ไขสำเร็จ", {
+  //     description: `ปรับปรุงข้อมูลของ ${values.fullname} แล้ว`,
+  //   });
+  // }
+async function handleEdit(
+  values: EditUserValues
+): Promise<void> {
+  if (!activeUser) return
+
+  try {
+    await updateUser(activeUser.id, values)
+
     setUsers((prev) =>
       prev.map((u) =>
-        u.id === activeUser.id ? { ...u, ...values } : u
+        u.id === activeUser.id
+          ? {
+              ...u,
+              ...values,
+            }
+          : u
       )
     )
+
     toast.success('บันทึกการแก้ไขสำเร็จ', {
       description: `ปรับปรุงข้อมูลของ ${values.fullname} แล้ว`,
     })
-  }
+  } catch (error) {
+    toast.error('ไม่สามารถแก้ไขข้อมูลผู้ใช้งานได้')
 
-  function handleChangePassword() {
+    throw error
+  }
+}
+
+  // function handleChangePassword() {
+  //   toast.success("เปลี่ยนรหัสผ่านสำเร็จ", {
+  //     description: `อัปเดตรหัสผ่านของ ${activeUser?.username ?? ""} แล้ว`,
+  //   });
+  // }
+
+async function handleChangePassword(
+  values: ChangePasswordValues
+): Promise<void> {
+  if (!activeUser) return
+
+  try {
+    await changePassword(activeUser.id, values)
+
     toast.success('เปลี่ยนรหัสผ่านสำเร็จ', {
-      description: `อัปเดตรหัสผ่านของ ${activeUser?.username ?? ''} แล้ว`,
+      description: `อัปเดตรหัสผ่านของ ${
+        activeUser.username
+      } แล้ว`,
     })
-  }
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : 'ไม่สามารถเปลี่ยนรหัสผ่านได้'
+    )
 
-  function handleDelete() {
-    if (!activeUser) return
-    setUsers((prev) => prev.filter((u) => u.id !== activeUser.id))
+    throw error
+  }
+}
+
+  // function handleDelete() {
+  //   if (!activeUser) return;
+  //   setUsers((prev) => prev.filter((u) => u.id !== activeUser.id));
+  //   toast.success("ลบผู้ใช้งานสำเร็จ", {
+  //     description: `ลบ ${activeUser.fullname} ออกจากระบบแล้ว`,
+  //   });
+  //   setDeleteOpen(false);
+  //   setActiveUser(null);
+  // }
+
+
+
+async function handleDelete(): Promise<void> {
+  if (!activeUser) return
+
+  try {
+    await deleteUser(activeUser.id)
+
+    setUsers((prev) =>
+      prev.filter((u) => u.id !== activeUser.id)
+    )
+
     toast.success('ลบผู้ใช้งานสำเร็จ', {
       description: `ลบ ${activeUser.fullname} ออกจากระบบแล้ว`,
     })
+
     setDeleteOpen(false)
     setActiveUser(null)
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : 'ไม่สามารถลบผู้ใช้งานได้'
+    )
+
+    throw error
   }
+}
+
 
   function goToPage(p: number) {
-    setPage(Math.min(Math.max(1, p), totalPages))
+    setPage(Math.min(Math.max(1, p), totalPages));
   }
 
   return (
@@ -141,7 +270,7 @@ export function UsersPage() {
           กำหนดข้อมูลผู้ใช้งาน
         </h1>
         <p className="text-sm text-muted-foreground">
-          จัดการบัญชีผู้ใช้งาน สิทธิ์การเข้าถึง และข้อมูลหน่วยงานในระบบ EdPEx
+          จัดการบัญชีผู้ใช้งาน ในระบบ EdPEx
         </p>
       </header>
 
@@ -173,16 +302,16 @@ export function UsersPage() {
             users={pageUsers}
             startIndex={startIndex}
             onEdit={(user) => {
-              setActiveUser(user)
-              setEditOpen(true)
+              setActiveUser(user);
+              setEditOpen(true);
             }}
             onChangePassword={(user) => {
-              setActiveUser(user)
-              setPasswordOpen(true)
+              setActiveUser(user);
+              setPasswordOpen(true);
             }}
             onDelete={(user) => {
-              setActiveUser(user)
-              setDeleteOpen(true)
+              setActiveUser(user);
+              setDeleteOpen(true);
             }}
           />
         </div>
@@ -190,7 +319,7 @@ export function UsersPage() {
         <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             แสดง {filtered.length === 0 ? 0 : startIndex + 1}-
-            {Math.min(startIndex + PAGE_SIZE, filtered.length)} จากทั้งหมด{' '}
+            {Math.min(startIndex + PAGE_SIZE, filtered.length)} จากทั้งหมด{" "}
             {filtered.length} รายการ
           </p>
           <Pagination className="mx-0 w-auto justify-end">
@@ -202,17 +331,17 @@ export function UsersPage() {
                   aria-disabled={currentPage === 1}
                   className={
                     currentPage === 1
-                      ? 'pointer-events-none opacity-50'
+                      ? "pointer-events-none opacity-50"
                       : undefined
                   }
                   onClick={(e) => {
-                    e.preventDefault()
-                    goToPage(currentPage - 1)
+                    e.preventDefault();
+                    goToPage(currentPage - 1);
                   }}
                 />
               </PaginationItem>
               {pageNumbers.map((p, i) =>
-                p === 'ellipsis' ? (
+                p === "ellipsis" ? (
                   <PaginationItem key={`ellipsis-${i}`}>
                     <PaginationEllipsis />
                   </PaginationItem>
@@ -222,14 +351,14 @@ export function UsersPage() {
                       href="#"
                       isActive={p === currentPage}
                       onClick={(e) => {
-                        e.preventDefault()
-                        goToPage(p)
+                        e.preventDefault();
+                        goToPage(p);
                       }}
                     >
                       {p}
                     </PaginationLink>
                   </PaginationItem>
-                )
+                ),
               )}
               <PaginationItem>
                 <PaginationNext
@@ -238,12 +367,12 @@ export function UsersPage() {
                   aria-disabled={currentPage === totalPages}
                   className={
                     currentPage === totalPages
-                      ? 'pointer-events-none opacity-50'
+                      ? "pointer-events-none opacity-50"
                       : undefined
                   }
                   onClick={(e) => {
-                    e.preventDefault()
-                    goToPage(currentPage + 1)
+                    e.preventDefault();
+                    goToPage(currentPage + 1);
                   }}
                 />
               </PaginationItem>
@@ -252,11 +381,18 @@ export function UsersPage() {
         </div>
       </section>
 
+      {/* <AddUserDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onSubmit={handleAdd}
+      /> */}
+
       <AddUserDialog
         open={addOpen}
         onOpenChange={setAddOpen}
         onSubmit={handleAdd}
       />
+
       <EditUserDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -275,21 +411,18 @@ export function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>ยืนยันการลบผู้ใช้งาน</AlertDialogTitle>
             <AlertDialogDescription>
-              คุณต้องการลบ &ldquo;{activeUser?.fullname}&rdquo; ออกจากระบบใช่หรือไม่?
-              การดำเนินการนี้ไม่สามารถย้อนกลับได้
+              คุณต้องการลบ &ldquo;{activeUser?.fullname}&rdquo;
+              ออกจากระบบใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDelete}
-            >
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
               ลบผู้ใช้งาน
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

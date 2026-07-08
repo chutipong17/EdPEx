@@ -15,10 +15,16 @@ import {
   pieData,
   yearOptions,
 } from '@/lib/mock-data'
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+     const session = await auth()
+      if (!session) {
+        redirect('/login')
+      }
   return (
-    <DashboardLayout>
+    <DashboardLayout user={session.user}>
       <div className="flex flex-col gap-6">
         {/* Page header */}
         <header>

@@ -1,61 +1,69 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { Header } from './header'
-import { Sidebar, SidebarMobileContent } from './sidebar'
+import { useEffect, useState } from "react";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Header } from "./header";
+import { Sidebar, SidebarMobileContent } from "./sidebar";
+import type { SessionUser } from "@/lib/auth";
+import { redirect } from 'next/navigation'
+export function DashboardLayout({
+  children,
+  user,
+}: {
+  user: SessionUser;
+  children: React.ReactNode;
+}) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
-  const [activeKey, setActiveKey] = useState('dashboard')
-
-  // Collapse sidebar automatically on laptop widths (1024px – 1279px)
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px) and (max-width: 1279px)')
-    const apply = () => setCollapsed(mq.matches)
-    apply()
-    mq.addEventListener('change', apply)
-    return () => mq.removeEventListener('change', apply)
-  }, [])
+    const mq = window.matchMedia("(min-width: 1024px) and (max-width: 1279px)");
 
-  const handleNavigate = (key: string) => {
-    setActiveKey(key)
-    setMobileOpen(false)
-  }
+    const apply = () => setCollapsed(mq.matches);
+
+    apply();
+
+    mq.addEventListener("change", apply);
+
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   function toggleSidebar() {
-    // On large screens toggle collapse; on small screens open the drawer.
     if (typeof window !== "undefined" && window.innerWidth >= 1024) {
-      setCollapsed((c) => !c)
+      setCollapsed((c) => !c);
     } else {
-      setMobileOpen((o) => !o)
+      setMobileOpen((o) => !o);
     }
   }
 
-
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar collapsed={collapsed} activeKey={activeKey} onNavigate={handleNavigate} />
+      {/* Desktop Sidebar */}
+      <Sidebar collapsed={collapsed} role={user.role}  />
 
+      {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-[260px] p-0">
           <SheetTitle className="sr-only">เมนูนำทาง</SheetTitle>
-          <SidebarMobileContent activeKey={activeKey} onNavigate={handleNavigate} />
+
+          <SidebarMobileContent onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 
+      {/* Content */}
       <div
         className={
           collapsed
-            ? 'lg:pl-20 transition-[padding] duration-200'
-            : 'lg:pl-[260px] transition-[padding] duration-200'
+            ? "lg:pl-20 transition-[padding] duration-200"
+            : "lg:pl-[260px] transition-[padding] duration-200"
         }
       >
-         <Header onToggleSidebar={toggleSidebar} />
-        {/* <Header onMenuClick={() => setMobileOpen(true)} /> */}
-        <main className="mx-auto w-full max-w-[1800px] p-3 md:p-6">{children}</main>
+        <Header onToggleSidebar={toggleSidebar} user={user} />
+
+        <main className="mx-auto w-full max-w-[1800px] p-3 md:p-6">
+          {children}
+        </main>
       </div>
     </div>
-  )
+  );
 }

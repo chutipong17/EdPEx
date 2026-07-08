@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react"
+import { CheckCircle2, AlertTriangle, XCircle, Grid2x2X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { IndicatorStatus } from "@/types/indicator-Edpx"
@@ -13,8 +13,8 @@ const config: Record<
     className: "bg-success/10 text-success ring-success/20",
   },
   warning: {
-    label: "เฝ้าระวัง",
-    icon: AlertTriangle,
+    label: "ไม่มีข้อมูล",
+    icon: Grid2x2X,
     className: "bg-warning/10 text-warning ring-warning/20",
   },
   danger: {

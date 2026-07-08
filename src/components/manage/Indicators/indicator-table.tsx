@@ -143,6 +143,7 @@ export function IndicatorTable({ data, sortKey, sortDir, onSort }: IndicatorTabl
                         ดูรายละเอียด
                       </Button>
                       <Button
+                       nativeButton={false}
                         render={<Link href={`/admin/manage/indicators/edit/${item.id}`} />}
                         variant="outline"
                         size="sm"

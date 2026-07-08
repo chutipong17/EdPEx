@@ -1,10 +1,17 @@
-import { UserLayout } from "@/components/manage/users/user-layout";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { UsersPage } from "@/components/manage/users/users-page";
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
 
-export default function UserManage() {
+export default async function UserManage() {
+   const session = await auth()
+    if (!session) {
+      redirect('/login')
+    }
+  
   return (
-    <UserLayout>
+    <DashboardLayout user={session.user}>
       <UsersPage />
-    </UserLayout>
+    </DashboardLayout>
   );
 }

@@ -1,19 +1,21 @@
 import { IndicatorList } from "@/components/manage/Indicators/indicator-list"
 import { indicators } from "@/lib/mock-indicators"
-import { IndicatorLayout } from "@/components/manage/Indicators/indicator-layout"
-export default function IndicatorsPage() {
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
+import { DashboardLayout } from "@/components/layout/dashboard-layout"
+export default async function IndicatorsPage() {
+    const session = await auth()
+    if (!session) {
+      redirect('/login')
+    }
+  
   return (
 
-    <IndicatorLayout>
+    <DashboardLayout  user={session.user}>
         <IndicatorList indicators={indicators} />
-    </IndicatorLayout>
+    </DashboardLayout>
    
-
-    // <div>
-    //     <h1>IndicatorsPage </h1>
-    // </div>
   )
   
-//   <IndicatorList indicators={indicators} />
 }
 
