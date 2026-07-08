@@ -13,14 +13,20 @@
     "prisma:seed": "npx prisma db seed",
     "prisma:migrate:dev": "npx prisma migrate dev",
     "prisma:migrate:deploy": "npx prisma migrate deploy",
-    "prisma:migrate:reset": "npx prisma migrate reset"
+    "prisma:migrate:reset": "npx prisma migrate reset",
+    "make:module": "node src/app/server/scripts/make-module.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@hono/node-server": "^2.0.6",
+    "@hono/zod-openapi": "^1.4.0",
     "@hookform/resolvers": "^5.4.0",
     "@tanstack/react-table": "^8.21.3",
+    "argon2": "^0.44.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hono": "^4.12.27",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.17.0",
     "next": "^16.2.7",
     "react": "19.2.4",
@@ -36,6 +42,7 @@
   "devDependencies": {
     "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -46,9 +53,15 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^6.0.3"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "lint-staged": {
+    "**/*": [
+      "eslint --fix",
+      "prettier --write --ignore-unknown"
+    ]
   }
 }

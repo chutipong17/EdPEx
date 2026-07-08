@@ -1,0 +1,7 @@
+[
+  { "id": 1, "conditionName": ">", "description": "Greater than" },
+  { "id": 2, "conditionName": "<", "description": "Less than" },
+  { "id": 3, "conditionName": ">=", "description": "Greater than or equal to" },
+  { "id": 4, "conditionName": "<=", "description": "Less than or equal to" },
+  { "id": 5, "conditionName": "=", "description": "Equal to" }
+]
