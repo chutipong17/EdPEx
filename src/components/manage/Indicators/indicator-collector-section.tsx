@@ -13,8 +13,8 @@ export function IndicatorCollectorSection() {
   return (
     <FormSection
       step={5}
-      title="กำหนดค่าเก็บ"
-      description="ระบุชื่อผู้เก็บข้อมูลและผลลัพธ์ (สูงสุด 6 รายการ)"
+      title="กำหนดคู่เทียบ"
+      description="ระบุชื่อคู่เทียบข้อมูลและผลลัพธ์ (สูงสุด 6 รายการ)"
       className="grid grid-cols-1 gap-4 md:grid-cols-2"
     >
       {Array.from({ length: 6 }).map((_, index) => (
@@ -27,24 +27,24 @@ export function IndicatorCollectorSection() {
               {index + 1}
             </span>
             <h3 className="text-sm font-medium text-foreground">
-              ผู้เก็บข้อมูลรายการที่ {index + 1}
+              คู่เทียบข้อมูลรายการที่ {index + 1}
             </h3>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field>
               <FieldLabel htmlFor={`collector-name-${index}`}>
-                ชื่อผู้เก็บ {index + 1}
+                ชื่อคู่เทียบ {index + 1}
               </FieldLabel>
               <Input
                 id={`collector-name-${index}`}
                 className="h-10"
-                placeholder="กรอกชื่อผู้เก็บ"
+                placeholder="กรอกชื่อคู่เทียบ"
                 {...register(`collectors.${index}.name` as const)}
               />
             </Field>
             <Field>
               <FieldLabel htmlFor={`collector-result-${index}`}>
-                ผลลัพธ์ผู้เก็บ {index + 1}
+                ผลลัพธ์คู่เทียบ {index + 1}
               </FieldLabel>
               <Input
                 id={`collector-result-${index}`}

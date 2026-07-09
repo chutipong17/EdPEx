@@ -2,7 +2,7 @@ export type IndicatorStatus = "success" | "warning" | "danger"
 
 export type IndicatorDataType = "ปริมาณ" | "ร้อยละ" | "สัดส่วน" | "ค่าเฉลี่ย"
 
-export type CollectionPeriod = "รายเดือน" | "รายไตรมาส" | "รายปี"
+export type CollectionPeriod = "รายเดือน" | "รายไตรมาส" | "รายปี" | "ปีการศึกษา"
 
 export type TargetCondition = "มากกว่าหรือเท่ากับ" | "น้อยกว่าหรือเท่ากับ" | "เท่ากับ" | "อยู่ในช่วง"
 
@@ -46,14 +46,18 @@ export const MONTHS: string[] = [
 ]
 
 export const INDICATOR_TYPES: string[] = [
-  "ด้านการเรียนการสอน",
-  "ด้านการวิจัย",
-  "ด้านการบริการวิชาการ",
+  "ตัวชี้วัด EdPEx",
+  "ตัวชี้วัดกลยุทธ์",
+  "ตัวชี้วัด OKRs",
   "ด้านการบริหารจัดการ",
   "ด้านทำนุบำรุงศิลปวัฒนธรรม",
 ]
 
-export const DATA_YEARS: string[] = ["2567", "2566", "2565", "2564"]
+// export const DATA_YEARS: string[] = ["2567", "2566", "2565", "2564"]
+export const DATA_YEARS: string[] = Array.from(
+  { length: 6 },
+  (_, index) => String(new Date().getFullYear() + 543 - index)
+)
 
 export const DATA_TYPES: IndicatorDataType[] = ["ปริมาณ", "ร้อยละ", "สัดส่วน", "ค่าเฉลี่ย"]
 
@@ -64,4 +68,4 @@ export const TARGET_CONDITIONS: TargetCondition[] = [
   "อยู่ในช่วง",
 ]
 
-export const COLLECTION_PERIODS: CollectionPeriod[] = ["รายเดือน", "รายไตรมาส", "รายปี"]
+export const COLLECTION_PERIODS: CollectionPeriod[] = ["รายเดือน", "รายไตรมาส", "รายปี","ปีการศึกษา"]

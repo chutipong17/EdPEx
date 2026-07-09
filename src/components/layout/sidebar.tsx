@@ -1,13 +1,9 @@
 "use client";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useRouter,usePathname } from "next/navigation";
+import { logout } from "@/app/actions/auth";
 import {
   LayoutDashboard,
   BarChart3,
@@ -20,13 +16,38 @@ import {
   FilePen,
   Building2,
 } from "lucide-react";
+import { UserRole } from "@/types/user";
+import { auth } from "@/lib/auth";
+import router from "next/router";
+const isMenuActive = (pathname: string, item: NavItem) => {
+  // Dashboard (/)
+  if (item.href === "/" && pathname === "/") {
+    return true;
+  }
 
+  // Menu ปกติ
+  if (item.href && item.href !== "/") {
+    return pathname.startsWith(item.href);
+  }
+
+  // Parent Menu
+  if (item.children) {
+    return item.children.some(
+      (child) =>
+        child.href &&
+        (pathname === child.href || pathname.startsWith(`${child.href}/`)),
+    );
+  }
+
+  return false;
+};
 export interface NavItem {
   label: string;
   icon: any;
   key: string;
   href?: string;
   children?: NavItem[];
+  roles?: string[];
 }
 
 export const navItems: NavItem[] = [
@@ -35,17 +56,20 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
     key: "dashboard",
     href: "/",
+    roles: ["ADMIN", "MANAGER"],
   },
   {
     label: "ภาพรวมผลลัพธ์",
     icon: BarChart3,
     key: "results",
     href: "/admin/results",
+    roles: ["ADMIN"],
   },
   {
     label: "บริหารจัดการ",
     icon: Settings2,
     key: "manage",
+    roles: ["ADMIN"],
     children: [
       {
         label: "จัดการเกณฑ์ EdPEx",
@@ -69,16 +93,16 @@ export const navItems: NavItem[] = [
         label: "จัดการหน่วยงาน",
         icon: Building2,
         key: "manage-departments",
-        href: "/manage/departments",
+        href: "/admin/manage/departments",
       },
-      
     ],
   },
   {
     label: "รายการตัวชี้วัด",
     icon: Users,
-    key: "stakeholders",
-    href: "/stakeholders",
+    key: "indicators",
+    href: "/my-indicators",
+    roles: ["ADMIN", "USER"],
   },
 ];
 
@@ -86,8 +110,8 @@ interface SidebarProps {
   collapsed?: boolean;
   activeKey?: string;
   onNavigate?: (key: string) => void;
+  role?: UserRole;
 }
-
 
 export function SidebarLogo({ collapsed }: { collapsed?: boolean }) {
   return (
@@ -114,52 +138,126 @@ export function SidebarLogo({ collapsed }: { collapsed?: boolean }) {
     </div>
   );
 }
+export function SidebarFooter({ collapsed }: { collapsed?: boolean }) {
+  return (
+    <div className="p-3">
+      <form action={logout}>
+        <button
+          type="submit"
+          className={cn(
+            "flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90",
+          )}
+        >
+          <LogOut className="size-4 shrink-0" />
+          {!collapsed && <span>ออกจากระบบ</span>}
+        </button>
+      </form>
+      {/* <button
+        type="button"
+        className={cn(
+          "flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90",
+        )}
+        onClick={logout()}
+      >
+        <LogOut className="size-4 shrink-0" />
+        {!collapsed && <span>ออกจากระบบ</span>}
+      </button> */}
+    </div>
+  );
+}
 
-export function SidebarNav({
-  collapsed,
-  activeKey = "dashboard",
-  onNavigate,
-}: SidebarProps) {
+export function SidebarNav({ collapsed, onNavigate, role }: SidebarProps) {
+  const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
+  const router = useRouter()
+  // console.log("pathname == ",role);
 
-   useEffect(() => {
-    const parentKeys = navItems
-      .filter((item) =>
-        item.children?.some((child) => child.key === activeKey)
-      )
-      .map((item) => item.key);
+const filteredNavItems = navItems.filter((item) => {
+if (role === 'ADMIN') return true
+    // role check
+    const matchRole =
+      !item.roles?.length ||
+      (role && item.roles.includes(role))
 
-    if (parentKeys.length) {
-      setOpenMenus((prev) => [
-        ...new Set([...prev, ...parentKeys]),
-      ]);
-    }
-  }, [activeKey]);
+    // href check (optional)
+    const matchHref =
+      !item.href ||
+      pathname.startsWith(item.href)
+
+    return matchRole && matchHref
+  })
+//   const filteredNavItems = navItems.filter((item) => {
+//   // ADMIN เห็นทุกเมนู
+//   if (role === 'ADMIN') return true
+
+//   const matchRole =
+//     !item.roles?.length ||
+//     (role && item.roles.includes(role))
+
+//   return matchRole
+// })
+  useEffect(() => {
+  const parentKeys = navItems
+    .filter((item) =>
+      item.children?.some(
+        (child) =>
+          child.href &&
+          (pathname === child.href ||
+            pathname.startsWith(`${child.href}/`)),
+      ),
+    )
+    .map((item) => item.key);
+
+  setOpenMenus(parentKeys);
+}, [pathname, navItems]);
+
+
+
+useEffect(() => {
+  if (role === "USER" && pathname === "/") {
+    router.replace("/my-indicators");
+  }
+ 
+  if (role === "MANAGER" && pathname !== "/") {
+    router.replace("/");
+  }
+  
+}, [pathname, role]);
+
+
+  // useEffect(() => {
+  //   const parentKeys = navItems
+  //     .filter((item) =>
+  //       item.children?.some(
+  //         (child) =>
+  //           child.href &&
+  //           (pathname === child.href || pathname.startsWith(`${child.href}/`)),
+  //       ),
+  //     )
+  //     .map((item) => item.key);
+
+  //   setOpenMenus((prev) => [...new Set([...prev, ...parentKeys])]);
+  // }, [pathname]);
+
+
   const toggleMenu = (key: string) => {
     setOpenMenus((prev) =>
-      prev.includes(key)
-        ? prev.filter((k) => k !== key)
-        : [...prev, key]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
     );
   };
 
   return (
-    <nav
-      className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-3"
-      aria-label="เมนูหลัก"
-    >
-      {navItems.map((item) => {
+    <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-3">
+      {filteredNavItems.map((item) => {
         const Icon = item.icon;
-        const active = item.key === activeKey;
+        const active = isMenuActive(pathname, item);
 
         const buttonClass = cn(
           "flex h-12 items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
-          collapsed
-            ? "w-12 justify-center"
-            : "w-full px-3",
+          collapsed ? "w-12 justify-center" : "w-full px-3",
           active
             ? "bg-accent text-primary"
-            : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+            : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
         );
 
         // ====================================
@@ -185,6 +283,10 @@ export function SidebarNav({
                   <div className="flex flex-col items-center gap-1">
                     {item.children.map((sub) => {
                       const SubIcon = sub.icon;
+                      const subActive =
+                        sub.href &&
+                        (pathname === sub.href ||
+                          pathname.startsWith(`${sub.href}/`));
 
                       return (
                         <Link
@@ -196,9 +298,9 @@ export function SidebarNav({
                           title={sub.label}
                           className={cn(
                             "flex size-10 items-center justify-center rounded-lg transition-colors",
-                            activeKey === sub.key
+                            subActive
                               ? "bg-primary/10 text-primary"
-                              : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-foreground",
                           )}
                         >
                           <SubIcon className="size-4" />
@@ -227,7 +329,7 @@ export function SidebarNav({
                 <ChevronDown
                   className={cn(
                     "size-4 transition-transform",
-                    isOpen && "rotate-180"
+                    isOpen && "rotate-180",
                   )}
                 />
               </button>
@@ -236,6 +338,10 @@ export function SidebarNav({
                 <div className="ml-6 mt-1 flex flex-col gap-1 border-l border-border pl-3">
                   {item.children.map((sub) => {
                     const SubIcon = sub.icon;
+                    const subActive =
+                      sub.href &&
+                      (pathname === sub.href ||
+                        pathname.startsWith(`${sub.href}/`));
 
                     return (
                       <Link
@@ -244,9 +350,9 @@ export function SidebarNav({
                         onClick={() => onNavigate?.(sub.key)}
                         className={cn(
                           "flex h-10 items-center gap-2 rounded-lg px-3 text-sm transition-colors",
-                          activeKey === sub.key
+                          subActive
                             ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground",
                         )}
                       >
                         <SubIcon className="size-4" />
@@ -296,23 +402,11 @@ export function SidebarNav({
   );
 }
 
-export function SidebarFooter({ collapsed }: { collapsed?: boolean }) {
-  return (
-    <div className="p-3">
-      <button
-        type="button"
-        className={cn(
-          "flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90",
-        )}
-      >
-        <LogOut className="size-4 shrink-0" />
-        {!collapsed && <span>ออกจากระบบ</span>}
-      </button>
-    </div>
-  );
-}
-
-export function Sidebar({ collapsed, activeKey, onNavigate }: SidebarProps) {
+export function Sidebar({ collapsed, activeKey, onNavigate,role }: SidebarProps) {
+ 
+  
+  
+  
   return (
     <aside
       className={cn(
@@ -323,6 +417,7 @@ export function Sidebar({ collapsed, activeKey, onNavigate }: SidebarProps) {
       <SidebarLogo collapsed={collapsed} />
 
       <SidebarNav
+        role={role}
         collapsed={collapsed}
         activeKey={activeKey}
         onNavigate={onNavigate}

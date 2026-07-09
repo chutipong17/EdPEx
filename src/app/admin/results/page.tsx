@@ -1,8 +1,15 @@
 import { ResultsDashboard } from "@/components/results/results-dashbord";
-export default function ResultsPage() {
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
+export default async function ResultsPage() {
+      const session = await auth()
+    if (!session) {
+      redirect('/login')
+    }
   return (
-    <div>
-     <ResultsDashboard/>
-    </div>
+    <DashboardLayout  user={session.user}>
+      <ResultsDashboard />
+    </DashboardLayout>
   );
 }

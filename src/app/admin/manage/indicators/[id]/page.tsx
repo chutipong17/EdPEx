@@ -7,7 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/manage/Indicators/status-badge";
 import { getIndicatorById } from "@/lib/mock-indicators";
 import { MONTHS } from "@/types/indicator-Edpx";
-import { IndicatorLayout } from "@/components/manage/Indicators/indicator-layout";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -48,11 +50,15 @@ export default async function IndicatorDetailPage({
   if (!indicator) {
     notFound();
   }
+   const session = await auth()
+      if (!session) {
+        redirect('/login')
+      }
 
   const activeCollectors = indicator.collectors.filter((c) => c.name);
 
   return (
-    <IndicatorLayout>
+     <DashboardLayout  user={session.user}>
       <div className="flex flex-col gap-5">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -129,7 +135,7 @@ export default async function IndicatorDetailPage({
               <>
                 <Separator className="my-4" />
                 <p className="mb-3 text-sm font-medium text-foreground">
-                  ผู้เก็บข้อมูลและผลลัพธ์
+                 คู่เทียบข้อมูลและผลลัพธ์
                 </p>
                 <ul className="flex flex-col gap-2">
                   {activeCollectors.map((c, i) => (
@@ -169,6 +175,6 @@ export default async function IndicatorDetailPage({
           </div>
         </SectionCard>
       </div>
-    </IndicatorLayout>
+    </DashboardLayout>
   );
 }

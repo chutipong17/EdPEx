@@ -94,37 +94,40 @@ export function UserTable({
               <TableCell className="font-mono text-sm text-muted-foreground">
                 {user.phone}
               </TableCell>
+              
               <TableCell>
                 <div className="flex flex-wrap items-center justify-center gap-2">
+                  
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-info/40 text-info hover:bg-info hover:text-info-foreground"
-                    onClick={() => onChangePassword(user)}
-                  >
-                    <KeyRound data-icon="inline-start" />
-                    เปลี่ยนรหัสผ่าน
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-warning/40 text-warning hover:bg-warning hover:text-warning-foreground"
+                    className="border-warning/40 text-warning hover:bg-warning hover:text-warning-foreground font-light"
                     onClick={() => onEdit(user)}
                   >
-                    <Pencil data-icon="inline-start" />
+                    <Pencil data-icon="inline-start" size={16}/>
                     แก้ไข
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    className="border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground font-light"
                     onClick={() => onDelete(user)}
                   >
-                    <Trash2 data-icon="inline-start" />
+                    <Trash2 data-icon="inline-start" size={16}/>
                     ลบ
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-info/40 text-info hover:bg-info hover:text-info-foreground font-light"
+                    onClick={() => onChangePassword(user)}
+                  >
+                    <KeyRound data-icon="inline-start" size={16}/>
+                    เปลี่ยนรหัสผ่าน
                   </Button>
                 </div>
               </TableCell>
+
             </TableRow>
           ))}
         </TableBody>

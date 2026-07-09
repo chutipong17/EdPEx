@@ -1,14 +1,18 @@
-"use client"
 
 import { Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-
+import type { SessionUser } from '@/lib/auth'
 interface HeaderProps {
-  onToggleSidebar: () => void
+  onToggleSidebar: () => void,
+   user: SessionUser
 }
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+export function Header({ onToggleSidebar,user}: HeaderProps) {
+  // const initials = user.name.trim().charAt(0) || 'U'
+    const initials =
+    user?.name?.trim()?.charAt(0)?.toUpperCase() || 'U'
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6">
       <div className="flex items-center gap-3">
@@ -32,12 +36,12 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
       <div className="flex items-center gap-3">
         <div className="hidden text-right leading-tight sm:block">
-          <p className="text-sm font-semibold">ADMIN</p>
-          <p className="text-xs text-muted-foreground">ผู้ดูแลระบบ</p>
+          <p className="text-sm font-semibold">{user?.name ?? '-'}</p>
+          <p className="text-xs text-muted-foreground"> {user?.department ?? '-'}</p>
         </div>
         <Avatar className="size-9 border">
           <AvatarFallback className="bg-accent text-sm font-semibold text-primary">
-            AD
+           {initials}
           </AvatarFallback>
         </Avatar>
       </div>

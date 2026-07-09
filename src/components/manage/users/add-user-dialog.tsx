@@ -33,6 +33,13 @@ interface AddUserDialogProps {
   onSubmit: (values: AddUserValues) => void
 }
 
+//API
+// interface AddUserDialogProps {
+//   open: boolean
+//   onOpenChange: (open: boolean) => void
+//   onSubmit: (values: AddUserValues) => Promise<void>
+// }
+
 export function AddUserDialog({
   open,
   onOpenChange,
@@ -49,10 +56,19 @@ export function AddUserDialog({
     }
   }, [open, form])
 
-  const handleSubmit = form.handleSubmit((values) => {
-    onSubmit(values)
+  // const handleSubmit = form.handleSubmit((values) => {
+  //   onSubmit(values)
+  //   onOpenChange(false)
+  // })
+  const handleSubmit = form.handleSubmit(async (values) => {
+  try {
+    await onSubmit(values)
+    form.reset()
     onOpenChange(false)
-  })
+  } catch (error) {
+    console.error(error)
+  }
+})
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Controller, useFormContext } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form";
 
-import { Field, FieldLabel, FieldError } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,18 +11,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { FormSection } from "./form-section"
-import { RequiredMark } from "./required-mark"
-import { DATA_YEARS, INDICATOR_TYPES  } from "@/types/indicator-Edpx"
-import type { IndicatorFormValues } from "@/lib/indicator-schema"
-
+} from "@/components/ui/select";
+import { FormSection } from "./form-section";
+import { RequiredMark } from "./required-mark";
+import { DATA_YEARS, INDICATOR_TYPES } from "@/types/indicator-Edpx";
+import type { IndicatorFormValues } from "@/lib/indicator-schema";
+import { mockIndicatorTypes } from "@/lib/mock-indicator-types";
 export function IndicatorBasicSection() {
   const {
     control,
     register,
     formState: { errors },
-  } = useFormContext<IndicatorFormValues>()
+  } = useFormContext<IndicatorFormValues>();
 
   return (
     <FormSection
@@ -80,9 +80,9 @@ export function IndicatorBasicSection() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {INDICATOR_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
+                  {mockIndicatorTypes.map((t) => (
+                    <SelectItem key={t.id} value={t.id.toString()}>
+                      {t.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -124,5 +124,5 @@ export function IndicatorBasicSection() {
         <FieldError errors={[errors.name]} />
       </Field>
     </FormSection>
-  )
+  );
 }

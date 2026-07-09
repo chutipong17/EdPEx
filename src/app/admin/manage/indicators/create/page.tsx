@@ -1,9 +1,15 @@
 import { IndicatorForm } from "@/components/manage/Indicators/indicator-form";
-import { IndicatorLayout } from "@/components/manage/Indicators/indicator-layout";
-export default function CreateIndicatorPage() {
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
+export default async function CreateIndicatorPage() {
+   const session = await auth()
+      if (!session) {
+        redirect('/login')
+      }
   return (
-    <IndicatorLayout>
+    <DashboardLayout user={session.user}>
       <IndicatorForm mode="create" title="เพิ่มตัวชี้วัด" />
-    </IndicatorLayout>
+    </DashboardLayout>
   );
 }
