@@ -1,4 +1,4 @@
-export function clearAuthData(): void {
+export async function clearAuthData(): Promise<void> {
   if (typeof window === "undefined") return;
 
   // Clear all auth cookies by setting them to expire
@@ -26,7 +26,7 @@ export function redirectToSignIn(): void {
 /**
  * Handle token expiration - clear data and redirect
  */
-export function handleTokenExpiration(): void {
-  clearAuthData();
+export async function handleTokenExpiration(): Promise<void> {
+  await clearAuthData();
   redirectToSignIn();
 }

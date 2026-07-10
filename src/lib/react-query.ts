@@ -33,6 +33,7 @@ export function useGenericMutation<TData = unknown, TError = unknown, TVariables
 ) {
   const queryClient = useQueryClient();
   return useMutation<TData, TError, TVariables>({
+    ...options,
     mutationFn,
     onSuccess: (...args) => {
       invalidateKeys.forEach((key) => {
@@ -40,7 +41,6 @@ export function useGenericMutation<TData = unknown, TError = unknown, TVariables
       });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 

@@ -7,6 +7,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true,
+  timeout: 10000,
 });
 
 axiosInstance.interceptors.request.use(
@@ -22,7 +23,7 @@ axiosInstance.interceptors.response.use(
     // Check if the error is due to unauthorized (401) - token expired
     if (error.response && error.response.status === 401) {
       // Clear all auth-related cookies and redirect to sign-in
-      handleTokenExpiration();
+      await handleTokenExpiration();
     }
     return Promise.reject(error);
   },
