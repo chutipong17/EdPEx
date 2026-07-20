@@ -78,7 +78,7 @@ model TargetCondition {
 }
 
 model Organization {
-  id                Int       @id @unique @default(autoincrement()) @map("id") @db.Int
+  id                Int       @id @unique @map("id")            @db.Int
   organizationCode  String    @unique @map("organization_code") @db.VarChar(100)
   organizationName  String    @map("organization_name")         @db.NVarChar(255)
   isDeleted         Boolean   @default(false) @map("is_deleted")
@@ -95,7 +95,7 @@ model Organization {
 model Department {
   id              Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   organizationId  Int       @map("organization_id")
-  departmentCode  String    @unique @map("department_code") @db.VarChar(100)
+  departmentCode  String?   @unique @map("department_code") @db.VarChar(100)
   departmentName  String    @map("department_name")         @db.NVarChar(255)
   isDeleted       Boolean   @default(false) @map("is_deleted")
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -221,7 +221,7 @@ model KpiTarget {
 
 model User {
   id           Int       @id @unique @default(autoincrement()) @map("id") @db.Int
-  departmentId Int       @map("department_id")
+  departmentId Int?      @map("department_id")
   firstName    String    @map("first_name") @db.NVarChar(255)
   lastName     String?   @map("last_name")  @db.NVarChar(255)
   email        String    @map("email")      @db.VarChar(255)
@@ -233,7 +233,7 @@ model User {
   createdBy    String    @map("created_by") @db.NVarChar(255)
   updatedBy    String?   @map("updated_by") @db.NVarChar(255)
 
-  department   Department @relation(fields: [departmentId], references: [id])
+  department   Department? @relation(fields: [departmentId], references: [id])
 
   kpiTarget      KpiTarget[]
   auth           Auth[]
@@ -320,7 +320,7 @@ model KpiSubmissionStatus {
 }
 
 model KpiSubmission {
-  id   Int    @id @unique @map("id") @db.Int
+  id                 Int       @id @unique @map("id") @db.Int
   kpiAssignmentId    Int       @map("kpi_assignment_id")
   statusId           Int?      @map("status_id")
   submittedBy        String    @map("submitted_by")        @db.NVarChar(100)

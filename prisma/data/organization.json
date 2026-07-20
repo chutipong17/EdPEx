@@ -1,0 +1,10 @@
+[
+  { 
+    "id": 1, 
+    "organizationCode": "UBRU", 
+    "organizationName": "มหาวิทยาลัยราชภัฏอุบลราชธานี", 
+    "isDeleted": false, 
+    "createdBy": "system", 
+    "updatedBy": "system" 
+  }
+]

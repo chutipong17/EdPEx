@@ -20,7 +20,7 @@ export class {{moduleNamePascal}}Controller {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "{{displayName}} failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "{{displayName}} failed" },
         },
         400,
       );

@@ -3,7 +3,8 @@ import { z } from "zod";
 const mobileNumberRegex = /^[0-9]{9,10}$/;
 
 export const SignUpDto = z.object({
-  department: z.number({ error: "กรุณาเลือกสังกัด", }).min(1, { message: "กรุณาเลือกสังกัด" }),
+  // department: z.number({ error: "กรุณาเลือกสังกัด", }).min(1, { message: "กรุณาเลือกสังกัด" }),
+  department: z.number().nullish().transform((value) => value ?? undefined),
   role: z.number({ error: "กรุณากำหนดสิทธิใช้งานระบบ", }).min(1, { message: "กรุณากำหนดสิทธิใช้งานระบบ" }),
   firstName: z.string({ error: "กรุณากรอกชื่อ", }).min(1, { message: "กรุณากรอกชื่อให้ถูกต้อง" }).max(255, { message: "ชื่อต้องไม่เกิน 255 ตัวอักษร" }),
   lastName: z.string().nullish().transform((value) => value ?? undefined),

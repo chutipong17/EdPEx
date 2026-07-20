@@ -10,3 +10,7 @@ export enum Permission {
   CAN_EDIT = 3,
   CAN_DELETE = 4,
 }
+
+export enum Organization {
+  UBRU = 'UBRU',
+}

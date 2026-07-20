@@ -37,6 +37,8 @@ export class AuthRepository {
               createdBy: true,
               updatedBy: true,
               rolePermission: {
+                where: { isDeleted: false },
+                take: 1,
                 select: {
                   roleId: true,
                 },

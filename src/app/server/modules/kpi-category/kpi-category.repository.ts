@@ -73,8 +73,8 @@ export class KpiCategoryRepository {
         },
       });
     } catch (error) {
-      customLog.error("Error updating kpi category", { error });
-      throw new HTTPException(400, { message: "Failed to update kpi category" });
+      customLog.error("Error deleting kpi category", { error });
+      throw new HTTPException(400, { message: "Failed to delete kpi category" });
     }
   }
 }

@@ -72,6 +72,13 @@ export class AuthController {
         expires: result.expiresAt,
       });
 
+      const fullName = [result.user.firstName, result.user.lastName]
+        .filter(Boolean)
+        .join(" ");
+
+      c.set("user", result.user);
+      c.set("fullName", fullName);
+
       return c.json({
         success: true,
         data: result.user,
