@@ -19,7 +19,12 @@ export class KpiCategoryService {
   async getKpiCategoryById(id: number): Promise<KpiCategory | null> {
     try {
       customLog.info("Getting kpi category by ID service");
-      return this.kpiCategoryRepository.getKpiCategoryById(id);
+      const kpiCategory = await this.kpiCategoryRepository.getKpiCategoryById(id);
+      if (!kpiCategory) {
+        customLog.error("ไม่พบประเภทตัวชี้วัด");
+        throw new HTTPException(404, { message: "ไม่พบประเภทตัวชี้วัด" });
+      }
+      return kpiCategory;
     } catch (error) {
       customLog.error("Error getting kpi category by ID", { error });
       throw new Error("kpi category by ID failed");

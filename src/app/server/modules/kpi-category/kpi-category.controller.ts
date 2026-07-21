@@ -22,7 +22,7 @@ export class KpiCategoryController {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "kpi category failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi category failed" },
         },
         400,
       );
@@ -43,7 +43,7 @@ export class KpiCategoryController {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "kpi category by ID failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi category by ID failed" },
         },
         400,
       );
@@ -68,7 +68,7 @@ export class KpiCategoryController {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "creating KPI category failed" },
         },
         status,
       );
@@ -94,7 +94,7 @@ export class KpiCategoryController {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating KPI category failed" },
         },
         status,
       );
@@ -119,7 +119,7 @@ export class KpiCategoryController {
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "deleting KPI category failed" },
         },
         status,
       );

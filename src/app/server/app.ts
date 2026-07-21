@@ -4,30 +4,6 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import healthCheckRouter from "./modules/health-check/health-check.route";
-
-// Import modules
-// import { activityModule } from "./modules/activity/activity.module";
-// import { userModule } from "./modules/user/user.module";
-
-// Import utilities and middlewares
-// Uncomment and adapt these as needed
-// import { authGuard } from "../middlewares/gaurd.middleware";
-// import { customLog } from "../utils/custom-log";
-// import { authModule } from "./modules/auth/auth.module";
-// import { certificateModule } from "./modules/certificate/certificate.module";
-// import { dashboardModule } from "./modules/dashboard/dashboard.module";
-// import { evaluateScoreModule } from "./modules/evaluate-score/evaluate-score.module";
-// import { exportModule } from "./modules/export/export.module";
-// import { fileModule } from "./modules/file/file.module";
-// import { masterDataModule } from "./modules/master-data/master-data.module";
-// import { memberModule } from "./modules/member/member.module";
-// import { publicRelationModule } from "./modules/public-relation/public-relation.module";
-// import { regionModule } from "./modules/region/region.module";
-// import { signatureModule } from "./modules/signature/signature.module";
-// import { teamMemberModule } from "./modules/team-member/team-member.module";
-// import { thesisModule } from "./modules/thesis/thesis.module";
-// import { userActivitiesModule } from "./modules/user-activities/user-activities.module";
-// import { visitorModule } from "./modules/visitor/visitor.module";
 import roleRouter from "./modules/role/role.route";
 import monthOfDeliveryRouter from "./modules/month-of-delivery/month-of-delivery.route";
 import targetConditionRouter from "./modules/target-condition/target-condition.route";
@@ -36,6 +12,7 @@ import approveStatusRouter from "./modules/approve-status/approve-status.route";
 import authRouter from "./modules/auth/auth.route";
 import userRouter from "./modules/user/user.route";
 import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
+import departmentRouter from "./modules/department/department.route";
 
 export const runtime = "node";
 
@@ -86,30 +63,8 @@ const protectRoute = (router: Hono | OpenAPIHono) => {
 };
 */
 
-
-// Register modules
-// When you have authGuard ready, you can use: app.route("/user", protectRoute(userModule));
-// app.route("/user", userModule);
-
-app.route("/health-check", healthCheckRouter);
-
 // Add more module routes as you create them
-// app.route("/activity", activityModule);
-// app.route("/auth", authModule);
-// app.route("/certificate", certificateModule);
-// app.route("/dashboard", dashboardModule);
-// app.route("/evaluate-score", evaluateScoreModule);
-// app.route("/export", exportModule);
-// app.route("/file", fileModule);
-// app.route("/master-data", masterDataModule);
-// app.route("/region", regionModule);
-// app.route("/team-member", teamMemberModule);
-// app.route("/user-activities", userActivitiesModule);
-// app.route("/visitor", visitorModule);
-// app.route("/public-relation", publicRelationModule);
-// app.route("/member", memberModule);
-// app.route("/signature", signatureModule);
-// app.route("/theses", thesisModule);
+app.route("/health-check", healthCheckRouter);
 app.route("/role", roleRouter);
 app.route("/month-of-delivery", monthOfDeliveryRouter);
 app.route("/target-condition", targetConditionRouter);
@@ -118,6 +73,7 @@ app.route("/approve-status", approveStatusRouter);
 app.route("/auth", authRouter);
 app.route("/user", userRouter);
 app.route("/kpi-category", kpiCategoryRouter);
+app.route("/department", departmentRouter);
 
 // Serve OpenAPI JSON
 // app.doc("/swagger/json", {

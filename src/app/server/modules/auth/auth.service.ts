@@ -52,24 +52,34 @@ export class AuthService {
         type: argon2.argon2id,
       });
 
-      const adminUser = await this.userRepository.findUserById(userId);
-      const fullName = [adminUser?.firstName, adminUser?.lastName]
-        .filter(Boolean)
-        .join(" ");
+      const adminUser =
+        signUpDto.role === Role.ADMIN
+          ? null
+          : await this.userRepository.findUserById(userId);
+
+      const fullName =
+        signUpDto.role === Role.ADMIN
+          ? "system"
+          : [adminUser?.firstName, adminUser?.lastName]
+              .filter(Boolean)
+              .join(" ");
 
       const userData: Prisma.UserCreateInput = {
         email: signUpDto.email,
         firstName: signUpDto.firstName,
         lastName: signUpDto.lastName || undefined,
-        department: {
-          connect: { id: signUpDto.department },
-        },
         mobileNumber: signUpDto.mobileNumber || undefined,
         isDeleted: false,
         isActive: true,
         createdBy: adminUser ? fullName : "system",
         updatedBy: adminUser ? fullName : "system",
       };
+
+      if (signUpDto.role !== Role.ADMIN) {
+        userData.department = {
+          connect: { id: signUpDto.department },
+        };
+      }
 
       customLog.info("User data", { userData });
 

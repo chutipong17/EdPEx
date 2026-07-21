@@ -7,6 +7,7 @@ import targetCondition from "./data/target_condition.json";
 import frequency from "./data/frequency.json";
 import kpiSubmissionStatus from "./data/kpi_submission_status.json";
 import approveStatus from "./data/approve_status.json";
+import organization from "./data/organization.json";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,7 @@ const targetConditionData: Prisma.TargetConditionCreateManyInput[] = targetCondi
 const frequencyData: Prisma.FrequencyCreateManyInput[] = frequency;
 const kpiSubmissionStatusData: Prisma.KpiSubmissionStatusCreateManyInput[] = kpiSubmissionStatus;
 const approveStatusData: Prisma.ApprovalStatusCreateManyInput[] = approveStatus;
+const organizationData: Prisma.OrganizationCreateManyInput[] = organization;
 
 interface Upsertable<T> {
   upsert(args: {
@@ -54,6 +56,7 @@ async function main() {
   await upsertMany(prisma.frequency, frequencyData, ["id"]);
   await upsertMany(prisma.kpiSubmissionStatus, kpiSubmissionStatusData, ["id"]);
   await upsertMany(prisma.approvalStatus, approveStatusData, ["id"]);
+  await upsertMany(prisma.organization, organizationData, ["id"]);
 }
 
 main()

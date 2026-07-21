@@ -1,8 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { changePasswordValidator, signInValidator, signUpValidator } from "../../validator/validator";
 import { AuthController } from "./auth.controller";
-import { signUpValidator } from "../../validator/sign-up.validator";
-import { signInValidator } from "../../validator/sign-in.validator";
-import { changePasswordValidator } from "../../validator/change-password.validator";
 
 const authRouter = new OpenAPIHono();
 const controller = new AuthController();
