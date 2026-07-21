@@ -1,6 +1,8 @@
 import { {{moduleNamePascal}}Service } from "./{{moduleName}}.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
+import { convertErrorMessage } from "../../util/common";
 
 export class {{moduleNamePascal}}Controller {
   constructor(
@@ -17,12 +19,13 @@ export class {{moduleNamePascal}}Controller {
       });
     } catch (error) {
       customLog.error("Error getting {{displayName}}", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {
           success: false,
           error: { message: error instanceof Error ? convertErrorMessage(error.message) : "{{displayName}} failed" },
         },
-        400,
+        status,
       );
     }
   };

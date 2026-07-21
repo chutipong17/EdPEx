@@ -320,7 +320,7 @@ model KpiSubmissionStatus {
 }
 
 model KpiSubmission {
-  id                 Int       @id @unique @map("id") @db.Int
+  id                 Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   kpiAssignmentId    Int       @map("kpi_assignment_id")
   statusId           Int?      @map("status_id")
   submittedBy        String    @map("submitted_by")        @db.NVarChar(100)
@@ -348,7 +348,7 @@ model KpiSubmission {
 }
 
 model Attachment {
-  id              Int       @id @unique @map("id") @db.Int
+  id              Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   kpiSubmissionId Int       @map("kpi_submission_id")
   fileName        String    @map("file_name")  @db.NVarChar(200)
   filePath        String    @map("file_path")
@@ -367,7 +367,7 @@ model Attachment {
 }
 
 model Approval {
-  id               Int       @id @unique @map("id") @db.Int
+  id               Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   kpiSubmissionId  Int       @map("kpi_submission_id")
   approverId       Int       @map("approver_id")
   approvalStatusId Int       @map("approval_status_id")
@@ -412,7 +412,7 @@ model NotificationTemplate {
 }
 
 model Notification {
-  id         Int     @id @unique @map("id") @db.Int
+  id         Int     @id @unique @default(autoincrement()) @map("id") @db.Int
   userId     Int     @map("user_id")
   templateId Int     @map("template_id")
   title      String? @map("template_name")  @db.NVarChar(Max)
@@ -428,7 +428,7 @@ model Notification {
 }
 
 model ApplicationLog {
-  id         Int       @id @unique @map("id") @db.Int
+  id         Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   userId     Int       @map("user_id")
   moduleName String    @map("module_name")    @db.VarChar(255)
   actionType String    @map("action_type")    @db.VarChar(255)

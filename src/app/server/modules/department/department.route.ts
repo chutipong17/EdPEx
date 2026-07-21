@@ -11,6 +11,7 @@ departmentRouter.get("/:id", protectRoute, controller.getDepartmentById);
 departmentRouter.delete("/:id", protectRoute, controller.deleteDepartment);
 departmentRouter.post(
   "/",
+  protectRoute,
   departmentValidator,
   async (c) => {
     const body = c.req.valid("json");

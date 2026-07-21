@@ -20,12 +20,13 @@ export class DepartmentController {
       });
     } catch (error) {
       customLog.error("Error getting department", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {
           success: false,
           error: { message: error instanceof Error ? convertErrorMessage(error.message) : "department failed" },
         },
-        400,
+        status,
       );
     }
   };
@@ -41,12 +42,13 @@ export class DepartmentController {
       });
     } catch (error) {
       customLog.error("Error getting department by ID", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {
           success: false,
           error: { message: error instanceof Error ? convertErrorMessage(error.message) : "department by ID failed" },
         },
-        400,
+        status,
       );
     }
   };
