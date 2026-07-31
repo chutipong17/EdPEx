@@ -9,7 +9,7 @@ export class TargetConditionService {
   async getTargetCondition(): Promise<TargetCondition[]> {
     try {
       customLog.info("Getting target condition service");
-      return this.targetConditionRepository.getTargetCondition();
+      return await this.targetConditionRepository.getTargetCondition();
     } catch (error) {
       customLog.error("Error getting target condition", { error });
       const status = error instanceof HTTPException ? error.status : 500;

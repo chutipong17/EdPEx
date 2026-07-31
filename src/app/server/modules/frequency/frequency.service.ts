@@ -9,7 +9,7 @@ export class FrequencyService {
   async getFrequency(): Promise<Frequency[]> {
     try {
       customLog.info("Getting frequency service");
-      return this.frequencyRepository.getFrequency();
+      return await this.frequencyRepository.getFrequency();
     } catch (error) {
       customLog.error("Error getting frequency", { error });
       const status = error instanceof HTTPException ? error.status : 500;

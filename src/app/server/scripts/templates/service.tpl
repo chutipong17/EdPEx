@@ -9,7 +9,7 @@ export class {{moduleNamePascal}}Service {
   async get{{moduleNamePascal}}(): Promise<{{moduleNamePascal}}> {
     try {
       customLog.info("Getting {{displayName}} service");
-      return this.{{moduleNameCamel}}Repository.get{{moduleNamePascal}}();
+      return await this.{{moduleNameCamel}}Repository.get{{moduleNamePascal}}();
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Getting {{displayName}} failed";
