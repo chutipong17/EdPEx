@@ -1,6 +1,7 @@
 import { TargetConditionService } from "./target-condition.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
 
 export class TargetConditionController {
   constructor(
@@ -17,12 +18,13 @@ export class TargetConditionController {
       });
     } catch (error) {
       customLog.error("Error getting target condition", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {
           success: false,
           error: { message: error instanceof Error ? error.message : "target condition failed" },
         },
-        400,
+        status,
       );
     }
   };

@@ -1,6 +1,7 @@
 import { FrequencyService } from "./frequency.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
 
 export class FrequencyController {
   constructor(
@@ -17,12 +18,13 @@ export class FrequencyController {
       });
     } catch (error) {
       customLog.error("Error getting frequency", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
       return c.json(
         {
           success: false,
           error: { message: error instanceof Error ? error.message : "frequency failed" },
         },
-        400,
+        status,
       );
     }
   };
