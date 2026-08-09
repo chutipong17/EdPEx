@@ -25,7 +25,7 @@ export function AddIndicatorTypeDialog({
 }: AddIndicatorTypeDialogProps) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  // const {data:kpiCategoryData,isLoading:kpiCategoryLoading,error:kpiCategoryError} = useGetKpiCategory();
+  
   const { mutateAsync: createKpiCategory, isPending } = useCreateKpiCategory();
 
   async function handleSubmit(values: IndicatorTypeFormValues) {

@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useDeleteDepartment } from '@/service/department/department'
 
 interface DeleteDepartmentDialogProps {
   department: Department | null
@@ -29,18 +30,15 @@ export function DeleteDepartmentDialog({
   onDeleted,
 }: DeleteDepartmentDialogProps) {
   const [submitting, setSubmitting] = useState(false)
+  const { mutateAsync: deleteDepartment } = useDeleteDepartment();
 
   async function handleDelete() {
     if (!department) return
     setSubmitting(true)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department/${department.id}`, {
-        method: 'DELETE',
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error(data?.message ?? 'ไม่สามารถลบข้อมูลได้')
-      }
+      await  deleteDepartment({
+          id: department.id,
+        })
       toast.success('ลบหน่วยงานเรียบร้อยแล้ว')
       onOpenChange(false)
       onDeleted()
@@ -58,7 +56,7 @@ export function DeleteDepartmentDialog({
           <DialogTitle>ยืนยันการลบ</DialogTitle>
           <DialogDescription>
             คุณต้องการลบหน่วยงานนี้หรือไม่
-            {department ? ` "${department.name}"` : ''}
+            {department ? ` "${department.departmentName}"` : ''}
           </DialogDescription>
         </DialogHeader>
         <div className="-mx-4 -mb-4 mt-2 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end">

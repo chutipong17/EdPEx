@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const departmentSchema = z.object({
-  name: z
+  departmentName: z
     .string({ message: 'กรุณากรอกชื่อหน่วยงาน' })
     .trim()
     .min(1, { message: 'กรุณากรอกชื่อหน่วยงาน' })

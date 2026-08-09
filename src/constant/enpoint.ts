@@ -12,6 +12,21 @@ export const API_ENDPOINT = {
     UPDATE: (id: number) => `/api/kpi-category/${id}`,
     DELETE: (id: number) => `/api/kpi-category/${id}`,
   },
+   DEPARTMENT: {
+    GET_ALL: "/api/department",
+    GET_BY_ID: (id: number) => `/api/department/${id}`,
+    CREATE: "/api/department",
+    UPDATE: (id: number) => `/api/department/${id}`,
+    DELETE: (id: number) => `/api/department/${id}`,
+  },
+  USER: {
+    GET_ALL: "/api/user",
+    GET_BY_ID: (id: number) => `/api/user/${id}`,
+    CREATE: "/api/auth/sign-up",
+    UPDATE: (id: number) => `/api/user/${id}`,
+    DELETE: (id: number) => `/api/user/${id}`,
+  },
+  
   ROLE: {
     GET_ALL: "/api/role"
   },

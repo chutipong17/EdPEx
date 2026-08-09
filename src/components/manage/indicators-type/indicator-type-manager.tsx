@@ -11,36 +11,9 @@ import { EditIndicatorTypeDialog } from "./edit-indicator-type-dialog";
 import { DeleteIndicatorTypeDialog } from "./delete-indicator-type";
 import { useGetKpiCategory } from "@/service/kpi-category/kpi-category";
 
-// const fetcher = (url: string) =>
 
-//   fetch(url).then((res) => {
-//      console.log("res.ok:", res.json() as Promise<IndicatorType[]>);
-//     if (!res.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
-//     return res.json() as Promise<IndicatorType[]>;
-//   });
-interface KpiCategoryResponse {
-  success: boolean;
-  data: IndicatorType[];
-}
-
-// const fetcher = async (url: string): Promise<IndicatorType[]> => {
-//   const res = await fetch(url);
-
-//   if (!res.ok) {
-//     throw new Error("ไม่สามารถโหลดข้อมูลได้");
-//   }
-
-//   const json: KpiCategoryResponse = await res.json();
-
-//   return json.data;
-// };
 
 export function IndicatorTypeManager() {
-  // const {
-  //   data: indicatorTypes,
-  //   isLoading,
-  //   mutate,
-  // } = useSWR<IndicatorType[]>("/api/kpi-category", fetcher);
 
   const {
     data: kpiCategoryData,
@@ -49,7 +22,6 @@ export function IndicatorTypeManager() {
     refetch: mutate,
   } = useGetKpiCategory();
 
-  // console.log("indicatorTypes ===:", kpiCategoryData?.data);
 
   const [editTarget, setEditTarget] = useState<IndicatorType | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<IndicatorType | null>(null);

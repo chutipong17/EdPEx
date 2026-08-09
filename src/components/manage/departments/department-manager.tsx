@@ -14,17 +14,15 @@ import { DepartmentTable } from './department-table'
 import { AddDepartmentDialog } from './add-department-dialog'
 import { EditDepartmentDialog } from './edit-department-dialog'
 import { DeleteDepartmentDialog } from './delete-department-dialog'
-const fetcher = (url: string) =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error('ไม่สามารถโหลดข้อมูลได้')
-    return res.json() as Promise<Department[]>
-  })
+import { useGetDepartments } from '@/service/department/department'
 
 export function DepartmentManager() {
-  const { data, isLoading, mutate } = useSWR<Department[]>(
-   `${process.env.NEXT_PUBLIC_API_URL}/api/department`,
-    fetcher,
-  )
+  const {
+     data: departments,
+     isLoading: departmentsLoading,
+     error: departmentsError,
+     refetch: mutate,
+   } = useGetDepartments();
 
   const [editTarget, setEditTarget] = useState<Department | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null)
@@ -49,8 +47,8 @@ export function DepartmentManager() {
       </CardHeader>
       <CardContent>
         <DepartmentTable
-          data={data ?? []}
-          loading={isLoading}
+          data={departments?.data ?? []}
+          loading={departmentsLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />

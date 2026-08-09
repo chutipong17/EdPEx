@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { DepartmentForm } from './department-form'
-
+import { useCreateDepartment } from '@/service/department/department'
 interface AddDepartmentDialogProps {
   onCreated: () => void
 }
@@ -23,20 +23,24 @@ interface AddDepartmentDialogProps {
 export function AddDepartmentDialog({ onCreated }: AddDepartmentDialogProps) {
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const { mutateAsync: createDepartment, isPending } = useCreateDepartment();
 
   async function handleSubmit(values: DepartmentFormValues) {
     setSubmitting(true)
     try {
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error(data?.message ?? 'ไม่สามารถบันทึกข้อมูลได้')
-      }
+      // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(values),
+      // })
+        const res =  await createDepartment({
+        body: values,
+      });
+      // if (!res.ok) {
+      //   const data = await res.json().catch(() => null)
+      //   throw new Error(data?.message ?? 'ไม่สามารถบันทึกข้อมูลได้')
+      // }
       toast.success('เพิ่มหน่วยงานเรียบร้อยแล้ว')
       setOpen(false)
       onCreated()

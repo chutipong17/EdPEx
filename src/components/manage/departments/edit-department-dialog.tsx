@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { DepartmentForm } from './department-form'
-
+import { useUpdateDepartment } from '@/service/department/department'
 interface EditDepartmentDialogProps {
   department: Department | null
   open: boolean
@@ -28,20 +28,23 @@ export function EditDepartmentDialog({
   onUpdated,
 }: EditDepartmentDialogProps) {
   const [submitting, setSubmitting] = useState(false)
+const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
   async function handleSubmit(values: DepartmentFormValues) {
     if (!department) return
     setSubmitting(true)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department/${department.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error(data?.message ?? 'ไม่สามารถบันทึกข้อมูลได้')
-      }
+     const res = await updateDepartment({
+      id: department.id,
+      body: {
+        departmentName: values.departmentName,
+      },
+    });
+
+      // if (!res.ok) {
+      //   const data = await res.json().catch(() => null)
+      //   throw new Error(data?.message ?? 'ไม่สามารถบันทึกข้อมูลได้')
+      // }
       toast.success('แก้ไขชื่อหน่วยงานเรียบร้อยแล้ว')
       onOpenChange(false)
       onUpdated()
@@ -65,7 +68,7 @@ export function EditDepartmentDialog({
         </DialogHeader>
         {open && department && (
           <DepartmentForm
-            defaultName={department.name}
+            defaultName={department.departmentName}
             submitting={submitting}
             onSubmit={handleSubmit}
           />
