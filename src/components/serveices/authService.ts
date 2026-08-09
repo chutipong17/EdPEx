@@ -13,7 +13,7 @@ export interface User {
   email: string
   department: string
   phone: string
-  role: 'ADMIN' | 'MANAGER' | 'USER'
+  role: 'ADMIN' | 'EXECUTIVE' | 'USER'
 }
 
 export interface ApiResponse<T = unknown> {

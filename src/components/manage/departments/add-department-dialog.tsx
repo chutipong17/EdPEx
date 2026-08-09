@@ -27,7 +27,8 @@ export function AddDepartmentDialog({ onCreated }: AddDepartmentDialogProps) {
   async function handleSubmit(values: DepartmentFormValues) {
     setSubmitting(true)
     try {
-      const res = await fetch('/api/departments', {
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),

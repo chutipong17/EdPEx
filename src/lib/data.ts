@@ -15,8 +15,8 @@ let nextResultId = 1
  * Returns ONLY the indicators owned by `userId`. Equivalent to
  *   SELECT * FROM indicators WHERE assignedUserId = :userId
  */
-export function getIndicatorsForUser(userId: string): Indicator[] {
-  return MOCK_INDICATORS.filter((i) => i.assignedUserId === userId)
+export function getIndicatorsForUser(userId: number): Indicator[] {
+  return MOCK_INDICATORS.filter( (i) => i.assignedUserId === String(userId))
 }
 
 /**

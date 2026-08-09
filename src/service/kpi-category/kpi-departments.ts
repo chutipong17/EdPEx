@@ -3,7 +3,7 @@ import axiosInstance from "@/lib/axios";
 import { createQueryKey, useGenericMutation, useGenericQuery } from "@/lib/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { KpiCategory } from "@/types/kpi";
-import { IndicatorTypeFormValues } from "@/lib/indicator-type-schema";
+import { DepartmentFormValues} from "@/lib/department-schema";
 import { useRouter } from "next/navigation";
 
 export const useGetKpiCategory = () => {
@@ -13,23 +13,7 @@ export const useGetKpiCategory = () => {
   );
   return { data: data?.data, isLoading, error, refetch };
 };
-// export const useGetKpiCategory = () => {
-//   return useGenericQuery(
-//     ["kpi-category"],
-//     async () => {
 
-//       console.log("CALL API");
-
-//       const response = await axiosInstance.get(
-//         API_ENDPOINT.KPI_CATEGORY.GET_ALL
-//       );
-
-//       console.log("RESPONSE:", response.data);
-
-//       return response.data.data;
-//     }
-//   );
-// };
 
 export const useGetKpiCategoryById = (
   id: number,

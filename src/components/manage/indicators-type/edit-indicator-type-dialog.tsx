@@ -17,6 +17,7 @@ import {
 
 import type { IndicatorTypeFormValues } from "@/lib/indicator-type-schema";
 import { IndicatorTypeForm } from "./indicator-type-form";
+import { useUpdateKpiCategory } from "@/service/kpi-category/kpi-category";
 
 interface EditIndicatorTypeDialogProps {
   indicatorType: IndicatorType | null;
@@ -32,23 +33,24 @@ export function EditIndicatorTypeDialog({
   onUpdated,
 }: EditIndicatorTypeDialogProps) {
   const [submitting, setSubmitting] = useState(false);
-
+  
+const { mutateAsync: updateKpiCategory } = useUpdateKpiCategory();
   async function handleSubmit(values: IndicatorTypeFormValues) {
     if (!indicatorType) return;
+
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/my-indicator-types/${indicatorType.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "appliction/json" },
-        body: JSON.stringify(values),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.message ?? "ไม่สามารถบันทึกข้อมูลได้");
-      }
-      toast.success("แก้ไขประเภทตัวชี้วัดเรียบร้อย");
-      onOpenChange(false);
-      onUpdated();
+      
+       const res = await updateKpiCategory({
+      id: indicatorType.id,
+      body: {
+        categoryName: values.categoryName,
+      },
+    });
+
+    toast.success("แก้ไขประเภทตัวชี้วัดเรียบร้อย");
+    onOpenChange(false);
+    onUpdated();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "ไม่สามารถบันทึกข้อมูลได้",
@@ -68,7 +70,7 @@ export function EditIndicatorTypeDialog({
         </DialogHeader>
         {open && indicatorType && (
           <IndicatorTypeForm
-            defaultName={indicatorType.name}
+            defaultName={indicatorType.categoryName}
             submitting={submitting}
             onSubmit={handleSubmit}
           ></IndicatorTypeForm>

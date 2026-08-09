@@ -28,19 +28,19 @@ export function IndicatorTypeForm({
         formState:{errors},
     } = useForm<IndicatorTypeFormValues>({
         resolver:zodResolver(indicatorTypeSchema),
-        defaultValues: {name:defaultName},
+        defaultValues: {categoryName:defaultName},
         mode:'onSubmit',
     })
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <FieldGroup className='px-1 py-2'>
-                <Field data-invalid={!!errors.name || undefined}>
+                <Field data-invalid={!!errors.categoryName || undefined}>
                     <FieldLabel htmlFor="department-name">
                         ประเภทตัวชี้วัด <span className='text-destructive'></span>
                     </FieldLabel>
-                    <Input id="department-name" placeholder='กรอกประเภทตัวชี้วัด' autoComplete="off" aria-invalid={!!errors.name || undefined} {...register('name')} />
-                    <FieldError errors = {errors.name? [errors.name] : undefined}/>
+                    <Input id="department-name" placeholder='กรอกประเภทตัวชี้วัด' autoComplete="off" aria-invalid={!!errors.categoryName || undefined} {...register('categoryName')} />
+                    <FieldError errors = {errors.categoryName? [errors.categoryName] : undefined}/>
                 </Field>
             </FieldGroup>
 

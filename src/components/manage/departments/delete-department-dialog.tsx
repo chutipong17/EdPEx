@@ -34,7 +34,7 @@ export function DeleteDepartmentDialog({
     if (!department) return
     setSubmitting(true)
     try {
-      const res = await fetch(`/api/departments/${department.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department/${department.id}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

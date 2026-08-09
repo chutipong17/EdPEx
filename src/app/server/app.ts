@@ -12,7 +12,7 @@ import approveStatusRouter from "./modules/approve-status/approve-status.route";
 import authRouter from "./modules/auth/auth.route";
 import userRouter from "./modules/user/user.route";
 import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
-import departmentRouter from "./modules/department/department.route";
+import departmentRouter from "./modules/departments/department.route";
 
 export const runtime = "node";
 
@@ -23,9 +23,10 @@ app.use("*", logger());
 app.use("*", secureHeaders());
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
     allowHeaders: ["Content-Type", "Authorization", "X-Custom-Header", "Upgrade-Insecure-Requests"],
     allowMethods: ["POST", "GET", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true,
   }),
 );
 

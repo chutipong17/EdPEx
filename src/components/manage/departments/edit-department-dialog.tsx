@@ -33,7 +33,7 @@ export function EditDepartmentDialog({
     if (!department) return
     setSubmitting(true)
     try {
-      const res = await fetch(`/api/departments/${department.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/department/${department.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),

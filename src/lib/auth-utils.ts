@@ -18,8 +18,8 @@ export async function clearAuthData(): Promise<void> {
 export function redirectToSignIn(): void {
   if (typeof window === "undefined") return;
 
-  if (!window.location.pathname.includes("/sign-in")) {
-    window.location.href = "/sign-in";
+  if (!window.location.pathname.includes("/login")) {
+    window.location.href = "/login";
   }
 }
 

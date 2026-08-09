@@ -17,7 +17,7 @@ export const mockUsers: User[] = [
     email: 'somchai.j@edpex.ac.th',
     department: 'คณะวิศวกรรมศาสตร์',
     phone: '0812345678',
-    role: 'MANAGER',
+    role: 'EXECUTIVE',
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ export const mockUsers: User[] = [
     email: 'pranee.k@edpex.ac.th',
     department: 'คณะแพทยศาสตร์',
     phone: '0867891234',
-    role: 'MANAGER',
+    role: 'EXECUTIVE',
   },
   {
     id: 6,
@@ -71,7 +71,7 @@ export const mockUsers: User[] = [
     email: 'apichat.r@edpex.ac.th',
     department: 'สำนักงานอธิการบดี',
     phone: '0834567891',
-    role: 'MANAGER',
+    role: 'EXECUTIVE',
   },
   {
     id: 9,
@@ -107,6 +107,6 @@ export const mockUsers: User[] = [
     email: 'surasak.b@edpex.ac.th',
     department: 'คณะแพทยศาสตร์',
     phone: '0823498761',
-    role: 'MANAGER',
+    role: 'EXECUTIVE',
   },
 ]

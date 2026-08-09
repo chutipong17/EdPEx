@@ -22,7 +22,7 @@ const fetcher = (url: string) =>
 
 export function DepartmentManager() {
   const { data, isLoading, mutate } = useSWR<Department[]>(
-    '/api/departments',
+   `${process.env.NEXT_PUBLIC_API_URL}/api/department`,
     fetcher,
   )
 
