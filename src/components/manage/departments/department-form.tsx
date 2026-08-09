@@ -35,14 +35,14 @@ export function DepartmentForm({
     formState: { errors },
   } = useForm<DepartmentFormValues>({
     resolver: zodResolver(departmentSchema),
-    defaultValues: { name: defaultName },
+    defaultValues: { departmentName: defaultName },
     mode: 'onSubmit',
   })
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <FieldGroup className="px-1 py-2">
-        <Field data-invalid={!!errors.name || undefined}>
+        <Field data-invalid={!!errors.departmentName || undefined}>
           <FieldLabel htmlFor="department-name">
             ชื่อหน่วยงาน <span className="text-destructive">*</span>
           </FieldLabel>
@@ -50,10 +50,10 @@ export function DepartmentForm({
             id="department-name"
             placeholder="กรอกชื่อหน่วยงาน"
             autoComplete="off"
-            aria-invalid={!!errors.name || undefined}
-            {...register('name')}
+            aria-invalid={!!errors.departmentName || undefined}
+            {...register('departmentName')}
           />
-          <FieldError errors={errors.name ? [errors.name] : undefined} />
+          <FieldError errors={errors.departmentName ? [errors.departmentName] : undefined} />
         </Field>
       </FieldGroup>
 

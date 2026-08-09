@@ -6,7 +6,7 @@ export const addUserSchema = z
   .object({
     department: z.string().min(1, 'กรุณาเลือกหน่วยงานที่รับผิดชอบ'),
     fullname: z.string().min(1, 'กรุณากรอกชื่อผู้รับผิดชอบ'),
-    role: z.enum(['ADMIN', 'USER', 'MANAGER'], {
+    role: z.enum(['ADMIN', 'USER', 'EXECUTIVE'], {
       message: 'กรุณากำหนดสิทธิ์เข้าใช้งานระบบ',
     }),
     email: z
@@ -31,7 +31,7 @@ export type AddUserValues = z.infer<typeof addUserSchema>
 export const editUserSchema = z.object({
   department: z.string().min(1, 'กรุณาเลือกหน่วยงานที่รับผิดชอบ'),
   fullname: z.string().min(1, 'กรุณากรอกชื่อผู้รับผิดชอบ'),
-  role: z.enum(['ADMIN', 'USER', 'MANAGER'], {
+  role: z.enum(['ADMIN', 'USER', 'EXECUTIVE'], {
     message: 'กรุณากำหนดสิทธิ์เข้าใช้งานระบบ',
   }),
   email: z.string().min(1, 'กรุณากรอกอีเมล').email('รูปแบบอีเมลไม่ถูกต้อง'),

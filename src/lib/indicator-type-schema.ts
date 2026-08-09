@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const indicatorTypeSchema = z.object({
-  name: z
+  categoryName: z
     .string({ message: 'กรุณากรอกประเภทตัวชี้วัด' })
     .trim()
     .min(1, { message: 'กรุณากรอกประเภทตัวชี้วัด' })

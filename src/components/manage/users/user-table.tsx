@@ -18,7 +18,7 @@ import type { User, UserRole} from '@/types/user'
 
 const roleStyles: Record<UserRole, string> = {
   ADMIN: 'border-primary/30 bg-accent text-primary',
-  MANAGER: 'border-warning/30 bg-warning/10 text-warning',
+  EXECUTIVE: 'border-warning/30 bg-warning/10 text-warning',
   USER: 'border-info/30 bg-info/10 text-info',
 }
 

@@ -1,34 +1,40 @@
 import { NextResponse } from "next/server";
-import {mockIndicatorTypes} from '@/lib/mock-indicator-types'
-import {indicatorTypeSchema} from '@/lib/indicator-type-schema'
+// import {mockIndicatorTypes} from '@/lib/mock-indicator-types'
+// import {indicatorTypeSchema} from '@/lib/indicator-type-schema'
+import axiosInstance from "@/lib/axios";
+// import { useGenericQuery } from "@/lib/react-query";
+import { API_ENDPOINT } from "@/constant/enpoint";
 
-export async function GET(){
- return NextResponse.json(mockIndicatorTypes)
+
+export async function GET() {
+    try {
+    const { data } = await axiosInstance.get(
+      API_ENDPOINT.KPI_CATEGORY.GET_ALL
+    );
+console.log("data API route:", data);
+    return NextResponse.json(data);
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: error.response?.data?.message ?? "โหลดข้อมูลไม่สำเร็จ" },
+      { status: error.response?.status ?? 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null)
-  const parsed = indicatorTypeSchema.safeParse(body)
+   try {
+    const body = await request.json();
 
-  if (!parsed.success) {
+    const { data } = await axiosInstance.post(
+      API_ENDPOINT.KPI_CATEGORY.CREATE,
+      body
+    );
+
+    return NextResponse.json(data);
+  } catch (error: any) {
     return NextResponse.json(
-      { message: parsed.error.issues[0]?.message ?? 'ข้อมูลไม่ถูกต้อง' },
-      { status: 400 },
-    )
+      { message: error.response?.data?.message ?? "เพิ่มข้อมูลไม่สำเร็จ" },
+      { status: error.response?.status ?? 500 }
+    );
   }
-
-  const now = new Date().toISOString()
-  const nextId =
-    mockIndicatorTypes.reduce((max, dept) => Math.max(max, dept.id), 0) + 1
-
-  const department = {
-    id: nextId,
-    name: parsed.data.name,
-    createdAt: now,
-    updatedAt: now,
-  }
-
-  mockIndicatorTypes.push(department)
-
-  return NextResponse.json(department, { status: 201 })
 }

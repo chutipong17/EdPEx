@@ -56,7 +56,7 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
     key: "dashboard",
     href: "/",
-    roles: ["ADMIN", "MANAGER"],
+    roles: ["ADMIN", "EXECUTIVE"],
   },
   {
     label: "ภาพรวมผลลัพธ์",
@@ -218,7 +218,7 @@ useEffect(() => {
     router.replace("/my-indicators");
   }
  
-  if (role === "MANAGER" && pathname !== "/") {
+  if (role === "EXECUTIVE" && pathname !== "/") {
     router.replace("/");
   }
   

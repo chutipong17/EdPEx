@@ -8,7 +8,7 @@ export default async function LoginPage() {
     
     switch (session?.user?.role) {
   case 'ADMIN':
-  case 'MANAGER':
+  case 'EXECUTIVE':
     redirect('/')
   case 'USER':
     redirect('/my-indicators')

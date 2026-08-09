@@ -1,4 +1,4 @@
-export type UserRole = 'ADMIN' | 'USER' | 'MANAGER'
+export type UserRole = 'ADMIN' | 'USER' | 'EXECUTIVE'
 
 export interface User {
   id: number
@@ -23,5 +23,5 @@ export const DEPARTMENTS = [
 export const ROLES: { label: string; value: UserRole }[] = [
   { label: 'ADMIN', value: 'ADMIN' },
   { label: 'USER', value: 'USER' },
-  { label: 'MANAGER', value: 'MANAGER' },
+  { label: 'EXECUTIVE', value: 'EXECUTIVE' },
 ]

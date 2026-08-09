@@ -85,7 +85,7 @@ export function IndicatorTypeTable({
         ),
         cell: ({ row }) => (
           <span className="font-medium text-foreground">
-            {row.original.name}
+            {row.original.categoryName}
           </span>
         ),
       },
@@ -101,7 +101,7 @@ export function IndicatorTypeTable({
               size="sm"
               onClick={() => onEdit(row.original)}
               className="gap-1.5 border-warning/40 text-warning hover:bg-warning/10 hover:text-warning"
-              aria-label={`แก้ไข${row.original.name}`}
+              aria-label={`แก้ไข${row.original.categoryName}`}
             >
               <Pencil className="size-3.5" aria-hidden="true" />
               แก้ไข
@@ -111,7 +111,7 @@ export function IndicatorTypeTable({
               size="sm"
               onClick={() => onDelete(row.original)}
               className="gap-1.5 border-danger/40 text-danger hover:bg-danger/10 hover:text-danger"
-              aira-label={`ลบ ${row.original.name}`}
+              aria-label={`ลบ ${row.original.categoryName}`}
             >
               <Trash2 className="size-3.5" aria-hidden="true" />
               ลบ
@@ -232,7 +232,7 @@ export function IndicatorTypeTable({
                     ลำดับ {currentPage * PAGE_SIZE + row.index + 1}
                   </span>
                   <span className="font-medium text-foreground">
-                    {row.original.name}
+                    {row.original.categoryName}
                   </span>
                 </div>
               </div>

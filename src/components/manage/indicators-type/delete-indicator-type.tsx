@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 
 import type { IndicatorType } from "@/types/indicator-type";
 import type { IndicatorTypeFormValues } from "@/lib/indicator-type-schema";
@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDeleteKpiCategory } from "@/service/kpi-category/kpi-category";
 
 interface DeleteIndicatorTypeDialogProps {
   indicatorType: IndicatorType | null;
@@ -29,25 +30,31 @@ export function DeleteIndicatorTypeDialog({
   onDeleted,
 }: DeleteIndicatorTypeDialogProps) {
   const [submitting, setSubmitting] = useState(false);
+  const { mutateAsync: deleteKpiCategory } = useDeleteKpiCategory();
 
   async function handleDelete() {
     if (!indicatorType) return;
     setSubmitting(true);
 
     try {
-      const res = await fetch(`/api/my-indicator-types/${indicatorType.id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.message ?? "ไม่สามารถลบข้อมูลได้");
-      }
-      toast.success("ลบประเภทตัวชี้วัดเรียบร้อยแล้ว");
-      onOpenChange(false);
-      onDeleted();
+      await toast.promise(
+        deleteKpiCategory({
+          id: indicatorType.id,
+        }),
+        {
+          loading: "กำลังลบ...",
+          success: "ลบประเภทตัวชี้วัดเรียบร้อยแล้ว",
+          error: "ลบประเภทตัวชี้วัดไม่สำเร็จ",
+        },
+      );
+
+      setTimeout(() => {
+        onOpenChange(false);
+        onDeleted();
+      }, 300);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "ไม่สามารถบลข้อมูลได้",
+        error instanceof Error ? error.message : "ลบประเภทตัวชี้วัดไม่สำเร็จ",
       );
     } finally {
       setSubmitting(false);
@@ -60,7 +67,7 @@ export function DeleteIndicatorTypeDialog({
           <DialogTitle>ยืนยันการลบ</DialogTitle>
           <DialogDescription>
             คุณต้องการลบประเภทตัวชี้วัดนี้หรือไม่
-            {indicatorType ? ` "${indicatorType.name}"` : ''}
+            {indicatorType ? ` "${indicatorType.categoryName}"` : ""}
           </DialogDescription>
         </DialogHeader>
         <div className="-mx-4 -mb-4 mt-2 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end">

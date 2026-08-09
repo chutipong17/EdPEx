@@ -1,3 +1,4 @@
+import { useGetAllUsers, useGetUserById, useCreateUser, useUpdateUser, useDeleteUser } from '@/service/user/user'
 import type {
   AddUserValues,
   EditUserValues,
@@ -13,7 +14,7 @@ export interface User {
   email: string
   department: string
   phone: string
-  role: 'ADMIN' | 'MANAGER' | 'USER'
+  role: 'ADMIN' | 'EXECUTIVE' | 'USER'
 }
 
 export interface ApiResponse<T = unknown> {
@@ -25,15 +26,21 @@ export interface ApiResponse<T = unknown> {
 // ==================== GET USERS ====================
 
 export async function getUsers(): Promise<User[]> {
-  const response = await fetch(`${API_URL}/users`, {
-    cache: 'no-store',
-  })
+  // const response = await fetch(`${API_URL}/users`, {
+  //   cache: 'no-store',
+  // })
+  const {
+       data: AllUsers,
+       isLoading: usersLoading,
+       error: usersError,
+       refetch: mutate,
+     } = useGetAllUsers();
 
-  const result: ApiResponse<User[]> = await response.json()
+  const result: ApiResponse<User[]> = await AllUsers.json()
 
-  if (!response.ok) {
-    throw new Error(result.message)
-  }
+  // if (!response.ok) {
+  //   throw new Error(result.message)
+  // }
 
   return result.data
 }

@@ -5,10 +5,10 @@ import { protectRoute } from "../../middlewares/guard.middleware";
 const kpiCategoryRouter = new OpenAPIHono();
 const controller = new KpiCategoryController();
 
-kpiCategoryRouter.get("/", protectRoute, controller.getKpiCategory);
-kpiCategoryRouter.get("/:id", protectRoute, controller.getKpiCategoryById);
-kpiCategoryRouter.post("/", protectRoute, controller.createKpiCategory);
-kpiCategoryRouter.patch("/:id", protectRoute, controller.updateKpiCategory);
-kpiCategoryRouter.delete("/:id", protectRoute, controller.deleteKpiCategory);
+kpiCategoryRouter.get("/", controller.getKpiCategory);
+kpiCategoryRouter.get("/:id", controller.getKpiCategoryById);
+kpiCategoryRouter.post("/", controller.createKpiCategory);
+kpiCategoryRouter.patch("/:id", controller.updateKpiCategory);
+kpiCategoryRouter.delete("/:id", controller.deleteKpiCategory);
 
 export default kpiCategoryRouter;

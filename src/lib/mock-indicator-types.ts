@@ -1,7 +1,8 @@
 import type { IndicatorType } from "@/types/indicator-type"
 const now = new Date().toISOString()
 
-// In-memory store used by the API route handlers (resets on server restart).
+
+
 export const mockIndicatorTypes: IndicatorType[] = [
   {
     id: 1,

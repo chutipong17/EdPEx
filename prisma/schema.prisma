@@ -95,7 +95,7 @@ model Organization {
 model Department {
   id              Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   organizationId  Int       @map("organization_id")
-  departmentCode  String?   @unique @map("department_code") @db.VarChar(100)
+  departmentCode  String?   @map("department_code") @db.VarChar(100)
   departmentName  String    @map("department_name")         @db.NVarChar(255)
   isDeleted       Boolean   @default(false) @map("is_deleted")
   createdAt       DateTime  @default(now()) @map("created_at")

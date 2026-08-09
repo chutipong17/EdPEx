@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { IndicatorTypeForm } from "./indicator-type-form";
+import { useCreateKpiCategory} from "@/service/kpi-category/kpi-category";
 
 interface AddIndicatorTypeDialogProps {
   onCreated: () => void;
@@ -24,19 +25,20 @@ export function AddIndicatorTypeDialog({
 }: AddIndicatorTypeDialogProps) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  
+  const { mutateAsync: createKpiCategory, isPending } = useCreateKpiCategory();
 
   async function handleSubmit(values: IndicatorTypeFormValues) {
+
     setSubmitting(true);
+ 
     try {
-      const res = await fetch("/api/my-indicator-types", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+     
+  
+     
+     const res =  await createKpiCategory({
+        body: values,
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.message ?? "ไม่สามารถบันทึกข้อมูลได้");
-      }
       toast.success("เพิ่มประเภทตัวชี้วัดเรียบร้อย");
       setOpen(false);
       onCreated();

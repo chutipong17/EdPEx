@@ -85,7 +85,7 @@ export function DepartmentTable({
         ),
         cell: ({ row }) => (
           <span className="font-medium text-foreground">
-            {row.original.name}
+            {row.original.departmentName}
           </span>
         ),
       },
@@ -101,7 +101,7 @@ export function DepartmentTable({
               size="sm"
               onClick={() => onEdit(row.original)}
               className="gap-1.5 border-warning/40 text-warning hover:bg-warning/10 hover:text-warning"
-              aria-label={`แก้ไข ${row.original.name}`}
+              aria-label={`แก้ไข ${row.original.departmentName}`}
             >
               <Pencil className="size-3.5" aria-hidden="true" />
               แก้ไข
@@ -111,7 +111,7 @@ export function DepartmentTable({
               size="sm"
               onClick={() => onDelete(row.original)}
               className="gap-1.5 border-danger/40 text-danger hover:bg-danger/10 hover:text-danger"
-              aria-label={`ลบ ${row.original.name}`}
+              aria-label={`ลบ ${row.original.departmentName}`}
             >
               <Trash2 className="size-3.5" aria-hidden="true" />
               ลบ
@@ -235,7 +235,7 @@ export function DepartmentTable({
                     {currentPage * PAGE_SIZE + row.index + 1}
                   </span>
                   <span className="font-medium text-foreground">
-                    {row.original.name}
+                    {row.original.departmentName}
                   </span>
                 </div>
               </div>
