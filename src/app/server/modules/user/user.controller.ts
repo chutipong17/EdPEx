@@ -79,7 +79,12 @@ export class UserController {
       const fullName = c.get("fullName");
       const id = Number(c.req.param("id"));
       const body: UserDto = await c.req.json();
-      const user = await this.userService.updateUser(id, body, fullName);
+      const parsed = UserDto.safeParse(body);
+      if (!parsed.success) {
+        throw new HTTPException(400, { message: "Invalid user data" });
+      }
+      const userDto = parsed.data;
+      const user = await this.userService.updateUser(id, userDto, fullName);
 
       customLog.info("User updated :", { user });
 
