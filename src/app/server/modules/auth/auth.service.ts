@@ -55,7 +55,7 @@ export class AuthService {
       const adminUser =
         signUpDto.role === Role.ADMIN
           ? null
-          : await this.userRepository.findUserById(userId);
+          : await this.userRepository.getUserById(userId);
 
       const fullName =
         signUpDto.role === Role.ADMIN
