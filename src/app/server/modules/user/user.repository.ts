@@ -17,7 +17,8 @@ export class UserRepository {
       });
     } catch (error) {
       customLog.error("Error fetching user by ID", { error });
-      throw new HTTPException(400, { message: "Failed to fetch user by ID" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to fetch user by ID" });
     }
   }
 
@@ -28,7 +29,8 @@ export class UserRepository {
       }) as User;
     } catch (error) {
       customLog.error("Error fetching user by email", { error });
-      throw new HTTPException(400, { message: "Failed to fetch user by email" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to fetch user by email" });
     }
   }
 
@@ -39,7 +41,8 @@ export class UserRepository {
       });
     } catch (error) {
       customLog.error("Error creating user", { error });
-      throw new HTTPException(400, { message: "Failed to create user" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to create user" });
     }
   }
 
@@ -53,7 +56,8 @@ export class UserRepository {
       });
     } catch (error) {
       customLog.error("Error fetching users", { error });
-      throw new HTTPException(400, { message: "Failed to fetch users" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to fetch users" });
     }
   }
 
@@ -69,7 +73,8 @@ export class UserRepository {
       });
     } catch (error) {
       customLog.error("Error searching users", { error });
-      throw new HTTPException(400, { message: "Failed to search users" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to search users" });
     }
   }
 
@@ -105,7 +110,8 @@ export class UserRepository {
       });
     } catch (error) {
       customLog.error("Error updating user", { error });
-      throw new HTTPException(400, { message: "Failed to update user" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to update user" });
     }
   }
 
@@ -142,7 +148,8 @@ export class UserRepository {
       return user;
     } catch (error) {
       customLog.error("Error deleting user", { error });
-      throw new HTTPException(400, { message: "Failed to delete user" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to delete user" });
     }
   }
 
