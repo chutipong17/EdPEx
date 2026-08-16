@@ -13,6 +13,34 @@ import authRouter from "./modules/auth/auth.route";
 import userRouter from "./modules/user/user.route";
 import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
 import departmentRouter from "./modules/departments/department.route";
+import kpiRouter from "./modules/kpi/kpi.route";
+import { verifyAccessToken } from "./config/jwt";
+import * as jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+
+declare module "hono" {
+  interface ContextVariableMap {
+    user: {
+      role?: any;
+      id: number;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      mobileNumber: string | null;
+      department: unknown;
+      isActive: boolean;
+      isDeleted: boolean;
+      createdAt: Date | null;
+      updatedAt: Date | null;
+      createdBy: string | null;
+      updatedBy: string | null;
+    };
+    userId: string;
+    fullName: string;
+  }
+}
+
+const prisma = new PrismaClient();
 
 export const runtime = "node";
 
@@ -36,6 +64,79 @@ app.use("*", (c, next) => {
   // Replace with your custom logger when ready
   // customLog.info("Request received", { method: c.req.method, url: c.req.url });
   return next();
+});
+
+app.use("*", async (c, next) => {
+  console.info("Auth guard", { method: c.req.method, url: c.req.url });
+  let token = c.req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    const cookieHeader = c.req.header("cookie");
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(";").reduce((acc: Record<string, string>, cookie) => {
+        const [key, value] = cookie.trim().split("=");
+        acc[key] = value;
+        return acc;
+      }, {});
+
+      token = cookies["edpex-session"];
+    }
+  }
+
+  if (!token) {
+    return c.json({ error: "Unauthorized - No token provided" }, 401);
+  }
+
+  // const JWT_SECRET = process.env.JWT_SECRET ?? "your-jwt-secret-key-for-development-only";
+
+  try {
+    const payload = verifyAccessToken(token);
+
+    if (!payload.sub) {
+      return c.json({ error: "Unauthorized - Invalid token" }, 401);
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: Number(payload.sub) },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        mobileNumber: true,
+        department: true,
+        isActive: true,
+        isDeleted: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+      },
+    });
+
+    if (!user) {
+      return c.json({ error: "Unauthorized - User not found" }, 401);
+    }
+
+    const fullName = [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(" ");
+
+    c.set("user", user);
+    c.set("userId", user.id.toString());
+    c.set("fullName", fullName);
+
+    await next();
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      return c.json({ error: "Unauthorized - Invalid token" }, 401);
+    } else if (error instanceof jwt.TokenExpiredError) {
+      return c.json({ error: "Unauthorized - Token expired" }, 401);
+    } else {
+      console.error("Auth guard error", { error });
+      return c.json({ error: "Internal server error" }, 500);
+    }
+  }
 });
 
 // Swagger UI routes (disabled in production)
@@ -75,6 +176,7 @@ app.route("/auth", authRouter);
 app.route("/user", userRouter);
 app.route("/kpi-category", kpiCategoryRouter);
 app.route("/department", departmentRouter);
+app.route("/kpi", kpiRouter);
 
 // Serve OpenAPI JSON
 // app.doc("/swagger/json", {

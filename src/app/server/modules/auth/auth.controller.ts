@@ -35,8 +35,12 @@ export class AuthController {
 
   signUp = async (c: Context, body: SignUpDto) => {
     try {
-      // const userId = await c.req.header("userId");
-      const userId = await c.get("userId");
+      const userId = c.get("userId");
+      customLog.info(userId);
+      if (!userId) {
+        throw new HTTPException(401, { message: "Unauthorized" });
+      }
+
       const result = await this.authService.signUp(body, Number(userId));
 
       customLog.info("Sign up result :", { result });
@@ -71,13 +75,6 @@ export class AuthController {
         path: "/",
         expires: result.expiresAt,
       });
-
-      const fullName = [result.user.firstName, result.user.lastName]
-        .filter(Boolean)
-        .join(" ");
-
-      c.set("user", result.user);
-      c.set("fullName", fullName);
 
       return c.json({
         success: true,
