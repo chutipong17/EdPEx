@@ -4,6 +4,7 @@ import { SignInDto } from '../dto/sign-in.dto';
 import { SignUpDto } from '../dto/sign-up.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { DepartmentDto } from '../dto/department.dto';
+import { KpiDto } from '../dto/kpi.dto';
 
 export const createValidator = <T>(schema: z.ZodType<T>) =>
   zValidator("json", schema, (result, c) => {
@@ -27,3 +28,4 @@ export const signInValidator = createValidator(SignInDto);
 export const signUpValidator = createValidator(SignUpDto);
 export const changePasswordValidator = createValidator(ChangePasswordDto);
 export const departmentValidator = createValidator(DepartmentDto);
+export const kpiValidator = createValidator(KpiDto);

@@ -1,7 +1,7 @@
 [
-  { "id": 1, "conditionName": ">", "description": "Greater than" },
-  { "id": 2, "conditionName": "<", "description": "Less than" },
-  { "id": 3, "conditionName": ">=", "description": "Greater than or equal to" },
-  { "id": 4, "conditionName": "<=", "description": "Less than or equal to" },
-  { "id": 5, "conditionName": "=", "description": "Equal to" }
+  { "id": 1, "conditionName": ">", "description": "มากกว่า" },
+  { "id": 2, "conditionName": "<", "description": "น้อยกว่า" },
+  { "id": 3, "conditionName": ">=", "description": "มากกว่าหรือเท่ากับ" },
+  { "id": 4, "conditionName": "<=", "description": "น้อยกว่าหรือเท่ากับ" },
+  { "id": 5, "conditionName": "=", "description": "เท่ากับ" }
 ]
