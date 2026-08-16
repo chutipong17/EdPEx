@@ -217,7 +217,24 @@ export class UserRepository {
             mobileNumber: data.mobileNumber,
           }),
           ...(data.departmentId !== undefined && {
-            departmentId: data.departmentId,
+            department: {
+              connect: {
+                id: data.departmentId,
+              },
+            },
+          }),
+          ...(data.roleId !== undefined && {
+            rolePermission: {
+              updateMany: {
+                where: {
+                  userId: id,
+                  isDeleted: false,
+                },
+                data: {
+                  roleId: data.roleId,
+                },
+              },
+            },
           }),
           updatedBy: data.updatedBy,
           updatedAt: new Date(),
