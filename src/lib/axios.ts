@@ -6,21 +6,12 @@ const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  // withCredentials: true,
+  withCredentials: true,
   timeout: 10000,
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    // const cookieStore = await cookies();
-    // const session = cookieStore.get("edpex_session");
-    // console.log(session?.value);
-    // // const auth = localStorage.getItem("edpex_session");
-
-    // if (session) {
-    //   config.headers.Authorization = `Bearer ${session.value}`;
-    // }
-
     return config;
   },
   (error) => Promise.reject(error),
