@@ -163,7 +163,7 @@ export class AuthService {
       const token = signAccessToken({
         sub: auth.userId.toString(),
         email: auth.user.email,
-        roleId: auth.user.rolePermission[0]?.roleId || 0,
+        roleId: auth.user.rolePermission[0]?.role.id || 0,
         fullName: [auth.user.firstName, auth.user.lastName].filter(Boolean).join(" "),
       });
 
@@ -173,10 +173,21 @@ export class AuthService {
         tokenExpiry
       );
 
+      const { rolePermission, department, ...userWithoutRolePermission } = auth.user;
+      const user = {
+        ...userWithoutRolePermission,
+        roleId: rolePermission?.[0]?.role?.id ?? null,
+        roleNameTh: rolePermission?.[0]?.role?.roleNameTH ?? null,
+        roleNameEn: rolePermission?.[0]?.role?.roleNameEn ?? null,
+        roleCode: rolePermission?.[0]?.role?.roleCode ?? null,
+        departmentName: department?.departmentName ?? null,
+        departmentId: department?.id ?? null,
+      };
+
       return {
         token,
         expiresAt: tokenExpiry,
-        user: auth.user,
+        user,
       };
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;

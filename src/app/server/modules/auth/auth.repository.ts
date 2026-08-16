@@ -41,9 +41,10 @@ export class AuthRepository {
                 where: { isDeleted: false },
                 take: 1,
                 select: {
-                  roleId: true,
+                  role: true,
                 },
-              }
+              },
+              department: true,
             },
           },
         },
