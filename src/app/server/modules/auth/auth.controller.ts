@@ -123,15 +123,8 @@ export class AuthController {
 
   changePassword = async (c: Context, body: ChangePasswordDto) => {
     try {
-      const token = getCookie(c, "edpex-session");
-      if (!token) {
-        return c.json({
-          success: false,
-          message: "Unauthorized",
-        }, 401);
-      }
-
-      const result = await this.authService.changePassword(body, token);
+      const updateBy = c.get("fullName");
+      const result = await this.authService.changePassword(body, updateBy);
 
       return c.json({
         success: true,

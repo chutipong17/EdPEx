@@ -197,7 +197,7 @@ export class AuthService {
     }
   }
 
-  async changePassword(request: ChangePasswordDto, token: string) {
+  async changePassword(request: ChangePasswordDto, updateBy: string) {
     try {
       customLog.info("Changing user password");
       if (request.password !== request.confirmPassword) {
@@ -205,17 +205,8 @@ export class AuthService {
         throw new HTTPException(400, { message: "รหัสผ่านไม่ตรงกัน" });
       }
 
-      // Verify and extract payload from token
-      const payload = verifyAccessToken(token);
-      customLog.info("Token payload", { payload });
-      
-      // Condition checks for payload
-      if (!payload) {
-        throw new HTTPException(401, { message: "Invalid or expired token" });
-      }
-
       const userId = request.userId;
-      const fullName = payload.fullName;
+      const fullName = updateBy || "system";
 
       // Hash and update new password
       const hashedPassword = await argon2.hash(request.password, {
