@@ -29,10 +29,20 @@ export class UserService {
     }
   }
 
-  async searchUsers(username?: string, department?: string): Promise<User[]> {
+  async searchUsers(
+    searchValue?: string,
+    page = 1,
+    pageSize = 10,
+  ): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
     try {
       customLog.info("Search users service");
-      return this.userRepository.searchUsers(username, department);
+      return this.userRepository.searchUsers(searchValue, page, pageSize);
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       customLog.error("Error searching users: ", { message: `${error}` || "Searching users failed" });

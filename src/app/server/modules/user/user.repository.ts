@@ -48,12 +48,49 @@ export class UserRepository {
 
   async getAllUser(): Promise<User[]> {
     try {
-      return await this.prisma.user.findMany({
+      const user = await this.prisma.user.findMany({
         where: { 
           isActive: true, 
           isDeleted: false 
         },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          mobileNumber: true,
+          departmentId: true,
+          isActive: true,
+          isDeleted: true,
+          createdAt: true,
+          updatedAt: true,
+          createdBy: true,
+          updatedBy: true,
+          department: {
+            where: {
+              isDeleted: false,
+            },
+            select: {
+              departmentName: true,
+            },
+          },
+          auth: {
+            where: {
+              isDeleted: false,
+            },
+            select: {
+              username: true,
+            },
+            take: 1,
+          },
+        },
       });
+
+      return user.map(({ auth, department, ...user }) => ({
+        ...user,
+        username: auth[0]?.username ?? null,
+        departmentName: department?.departmentName ?? null,
+      }));
     } catch (error) {
       customLog.error("Error fetching users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
@@ -61,16 +98,81 @@ export class UserRepository {
     }
   }
 
-  async searchUsers(username?: string, department?: string): Promise<User[]> {
+  async searchUsers(
+    searchValue?: string,
+    page = 1,
+    pageSize = 10,
+  ): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
     try {
-      const whereClause = this.buildWhereClause(username, department);
-      return await this.prisma.user.findMany({
-        where: { 
-          isActive: true, 
-          isDeleted: false,
-          ...whereClause
-        },
-      });
+      const safePage = Math.max(1, Number(page) || 1);
+      const safePageSize = Math.min(100, Math.max(1, Number(pageSize) || 10));
+      const skip = (safePage - 1) * safePageSize;
+      const whereClause = this.buildWhereClause(searchValue);
+      const where = {
+        isActive: true,
+        isDeleted: false,
+        ...whereClause,
+      };
+
+      const [total, users] = await this.prisma.$transaction([
+        this.prisma.user.count({ where }),
+        this.prisma.user.findMany({
+          where,
+          skip,
+          take: safePageSize,
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            mobileNumber: true,
+            departmentId: true,
+            isActive: true,
+            isDeleted: true,
+            createdAt: true,
+            updatedAt: true,
+            createdBy: true,
+            updatedBy: true,
+            department: {
+              where: {
+                isDeleted: false,
+              },
+              select: {
+                departmentName: true,
+              },
+            },
+            auth: {
+              where: {
+                isDeleted: false,
+              },
+              select: {
+                username: true,
+              },
+              take: 1,
+            },
+          },
+        }),
+      ]);
+
+      const data = users.map(({ auth, department, ...user }) => ({
+        ...user,
+        username: auth[0]?.username ?? null,
+        departmentName: department?.departmentName ?? null,
+      }));
+
+      return {
+        data,
+        total,
+        page: safePage,
+        pageSize: safePageSize,
+        totalPages: Math.max(1, Math.ceil(total / safePageSize)),
+      };
     } catch (error) {
       customLog.error("Error searching users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
@@ -153,18 +255,18 @@ export class UserRepository {
     }
   }
 
-  private buildWhereClause(username?: string, department?: string): Prisma.UserWhereInput {
+  private buildWhereClause(searchValue?: string): Prisma.UserWhereInput {
     const whereClause: Prisma.UserWhereInput = {
       isDeleted: false,
     };
 
-    if (username) {
+    if (searchValue) {
       whereClause.OR = [
         {
           auth: {
             some: {
               username: {
-                contains: username,
+                contains: searchValue,
               },
               isDeleted: false,
             },
@@ -172,24 +274,25 @@ export class UserRepository {
         },
         {
           firstName: {
-            contains: username,
+            contains: searchValue,
           },
         },
         {
           lastName: {
-            contains: username,
+            contains: searchValue,
+          },
+        },
+        {
+          department: {
+            is: {
+              departmentName: {
+                contains: searchValue,
+              },
+              isDeleted: false,
+            },
           },
         },
       ];
-    }
-
-    if (department) {
-      whereClause.department = {
-        departmentName: {
-          contains: department,
-        },
-        isDeleted: false,
-      };
     }
 
     return whereClause;

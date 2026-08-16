@@ -54,8 +54,9 @@ export class UserController {
 
   searchUsers = async (c: Context) => {
     try {
-      const { username, department } = await c.req.json();
-      const users = await this.userService.searchUsers(username, department);
+      const body = await c.req.json();
+      const { searchValue, page = 1, pageSize = 10 } = body ?? {};
+      const users = await this.userService.searchUsers(searchValue, page, pageSize);
 
       return c.json({
         success: true,
