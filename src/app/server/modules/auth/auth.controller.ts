@@ -77,6 +77,7 @@ export class AuthController {
         .join(" ");
 
       c.set("user", result.user);
+      c.set("userId", result.user.id.toString());
       c.set("fullName", fullName);
 
       return c.json({
