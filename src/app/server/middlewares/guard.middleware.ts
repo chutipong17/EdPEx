@@ -44,6 +44,11 @@ export const authGuard = async (c: Context, next: Next) => {
     const user = await prisma.user.findUnique({
       where: { id: Number(payload.sub) },
       select: {
+        role: {
+          select: {
+            id: true,
+          },
+        },
         id: true,
         email: true,
         firstName: true,
