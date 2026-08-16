@@ -206,7 +206,7 @@ export class AuthService {
       }
 
       const userId = request.userId;
-      const fullName = updateBy;
+      const fullName = updateBy || "system";
 
       // Hash and update new password
       const hashedPassword = await argon2.hash(request.password, {
