@@ -228,6 +228,7 @@ export class UserRepository {
               updateMany: {
                 where: {
                   userId: id,
+                  isDeleted: false,
                 },
                 data: {
                   roleId: data.roleId,
