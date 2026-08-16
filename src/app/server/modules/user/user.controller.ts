@@ -130,4 +130,26 @@ export class UserController {
       );
     }
   };
+
+  getUserByDepartment = async (c: Context) => {
+    try {
+      const departmentId = Number(c.req.param("id"));
+      const users = await this.userService.getUserByDepartment(departmentId);
+
+      return c.json({
+        success: true,
+        data: users,
+      });
+    } catch (error) {
+      customLog.error("Error getting users by department", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      return c.json(
+        {
+          success: false,
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "Getting users by department failed" },
+        },
+        status,
+      );
+    }
+  };
 }

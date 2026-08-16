@@ -83,13 +83,26 @@ export class UserRepository {
             },
             take: 1,
           },
+          rolePermission: {
+            where: {
+              isDeleted: false,
+            },
+            select: {
+              role: true,
+            },
+            take: 1,
+          },
         },
       });
 
-      return user.map(({ auth, department, ...user }) => ({
+      return user.map(({ auth, department, rolePermission, ...user }) => ({
         ...user,
         username: auth[0]?.username ?? null,
         departmentName: department?.departmentName ?? null,
+        roleId: rolePermission[0]?.role?.id ?? null,
+        roleNameTh: rolePermission[0]?.role?.roleNameTH ?? null,
+        roleNameEn: rolePermission[0]?.role?.roleNameEn ?? null,
+        roleCode: rolePermission[0]?.role?.roleCode ?? null,
       }));
     } catch (error) {
       customLog.error("Error fetching users", { error });
@@ -252,6 +265,22 @@ export class UserRepository {
       customLog.error("Error deleting user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
       throw new HTTPException(status, { message: "Failed to delete user" });
+    }
+  }
+
+  async getUserByDepartment(departmentId: number): Promise<User[]> {
+    try {
+      return await this.prisma.user.findMany({
+        where: { 
+          isActive: true, 
+          isDeleted: false,
+          departmentId
+        },
+      });
+    } catch (error) {
+      customLog.error("Error fetching users by department", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to fetch users by department" });
     }
   }
 
