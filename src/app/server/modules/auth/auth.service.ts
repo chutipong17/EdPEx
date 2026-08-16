@@ -100,7 +100,7 @@ export class AuthService {
         await this.roleRepository.createRolePermissionTransaction(tx, rolePermissionData);
 
         const authData: Prisma.AuthCreateInput = {
-          username: signUpDto.userName,
+          username: signUpDto.username,
           user: {
             connect: { id: createdUser.id },
           },
