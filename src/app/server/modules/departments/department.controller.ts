@@ -1,9 +1,9 @@
-import { DepartmentService } from "./department.service";
-import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
-import { DepartmentDto } from "../../dto/department.dto";
+import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { DepartmentDto } from "../../dto/department.dto";
 import { convertErrorMessage } from "../../util/common";
+import { DepartmentService } from "./department.service";
 
 export class DepartmentController {
   constructor(
