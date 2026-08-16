@@ -1,22 +1,25 @@
 // import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { ContextVariableMap } from "hono";
+import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
-import healthCheckRouter from "./modules/health-check/health-check.route";
-import roleRouter from "./modules/role/role.route";
-import monthOfDeliveryRouter from "./modules/month-of-delivery/month-of-delivery.route";
-import targetConditionRouter from "./modules/target-condition/target-condition.route";
-import frequencyRouter from "./modules/frequency/frequency.route";
+import * as jwt from "jsonwebtoken";
+import { verifyAccessToken } from "./config/jwt";
+import { Role } from "./enum/enum";
 import approveStatusRouter from "./modules/approve-status/approve-status.route";
 import authRouter from "./modules/auth/auth.route";
-import userRouter from "./modules/user/user.route";
-import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
 import departmentRouter from "./modules/departments/department.route";
+import frequencyRouter from "./modules/frequency/frequency.route";
+import healthCheckRouter from "./modules/health-check/health-check.route";
+import kpiCategoryRouter from "./modules/kpi-category/kpi-category.route";
 import kpiRouter from "./modules/kpi/kpi.route";
-import { verifyAccessToken } from "./config/jwt";
-import * as jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import monthOfDeliveryRouter from "./modules/month-of-delivery/month-of-delivery.route";
+import roleRouter from "./modules/role/role.route";
+import targetConditionRouter from "./modules/target-condition/target-condition.route";
+import userRouter from "./modules/user/user.route";
+import { getSession } from "./util/session";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -30,17 +33,11 @@ declare module "hono" {
       department: unknown;
       isActive: boolean;
       isDeleted: boolean;
-      createdAt: Date | null;
-      updatedAt: Date | null;
-      createdBy: string | null;
-      updatedBy: string | null;
     };
     userId: string;
     fullName: string;
   }
 }
-
-const prisma = new PrismaClient();
 
 export const runtime = "node";
 
@@ -67,75 +64,87 @@ app.use("*", (c, next) => {
 });
 
 app.use("*", async (c, next) => {
-  console.info("Auth guard", { method: c.req.method, url: c.req.url });
-  let token = c.req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    const cookieHeader = c.req.header("cookie");
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(";").reduce((acc: Record<string, string>, cookie) => {
-        const [key, value] = cookie.trim().split("=");
-        acc[key] = value;
-        return acc;
-      }, {});
-
-      token = cookies["edpex-session"];
-    }
-  }
-
-  if (!token) {
-    return c.json({ error: "Unauthorized - No token provided" }, 401);
-  }
-
-  // const JWT_SECRET = process.env.JWT_SECRET ?? "your-jwt-secret-key-for-development-only";
+  console.info("Auth guard", {
+    method: c.req.method,
+    url: c.req.url,
+  });
 
   try {
-    const payload = verifyAccessToken(token);
+    const isSignInRoute =
+      c.req.path === "/api/auth/sign-in" ||
+      c.req.path === "/api/auth/sign-in/" ||
+      c.req.path.startsWith("/api/auth/sign-in");
 
-    if (!payload.sub) {
-      return c.json({ error: "Unauthorized - Invalid token" }, 401);
+    if (isSignInRoute) {
+      console.info("Sign-in route, skipping auth guard");
+      return await next();
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: Number(payload.sub) },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        mobileNumber: true,
-        department: true,
-        isActive: true,
-        isDeleted: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-      },
-    });
+    // 1. Try Authorization header first
+    let token = c.req
+      .header("Authorization")
+      ?.replace(/^Bearer\s+/i, "");
 
-    if (!user) {
-      return c.json({ error: "Unauthorized - User not found" }, 401);
+    // 2. If no Authorization token, get token from cookie
+    if (!token) {
+      token = getCookie(c, "edpex-session");
     }
 
-    const fullName = [user.firstName, user.lastName]
-      .filter(Boolean)
-      .join(" ");
+    const session = getSession(c);
+    if (!session && !token) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
 
+    let payload;
+    if (token) {
+      payload = verifyAccessToken(token);
+    }
+
+    const user: ContextVariableMap["user"] = {
+      role: session?.role == null ? Role[Number(payload?.roleId)] : session?.role,
+      id: Number(session?.id) || Number(payload?.sub),
+      email: session?.email ?? payload?.email ?? "",
+      firstName: session?.firstName ?? "",
+      lastName: session?.lastName ?? "",
+      mobileNumber: session?.phone ?? "",
+      department: session?.department ?? "",
+      isActive: true,
+      isDeleted: false,
+    };
+
+    const fullName = token
+      ? payload?.fullName ?? [user.firstName, user.lastName].filter(Boolean).join(" ")
+      : [user.firstName, user.lastName].filter(Boolean).join(" ");
+
+    // // 6. Set data into current Hono context
     c.set("user", user);
     c.set("userId", user.id.toString());
     c.set("fullName", fullName);
 
+    // 7. Continue to controller
     await next();
+
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return c.json({ error: "Unauthorized - Invalid token" }, 401);
-    } else if (error instanceof jwt.TokenExpiredError) {
-      return c.json({ error: "Unauthorized - Token expired" }, 401);
-    } else {
-      console.error("Auth guard error", { error });
-      return c.json({ error: "Internal server error" }, 500);
+    if (error instanceof jwt.TokenExpiredError) {
+      return c.json(
+        { error: "Unauthorized - Token expired" },
+        401
+      );
     }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return c.json(
+        { error: "Unauthorized - Invalid token" },
+        401
+      );
+    }
+
+    console.error("Auth guard error", { error });
+
+    return c.json(
+      { error: "Internal server error" },
+      500
+    );
   }
 });
 
