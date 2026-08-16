@@ -70,7 +70,7 @@ model RolePermission {
 model TargetCondition {
   id            Int    @id @unique @map("id") @db.Int
   conditionName String @map("condition_name")  @db.VarChar(5)
-  description   String @map("description")     @db.VarChar(30)
+  description   String @map("description")     @db.NVarChar(255)
 
   kpi           Kpi[]
 
@@ -289,9 +289,8 @@ model KpiAssignment {
   id           Int       @id @unique @default(autoincrement()) @map("id") @db.Int
   userId       Int       @map("user_id")
   kpiId        Int       @map("kpi_id")
-  token        String    @map("token")
   assignedDate DateTime  @map("assigned_date")
-  dueDate      DateTime  @map("due_date")
+  dueDate      DateTime? @map("due_date")
   isDeleted    Boolean   @default(false) @map("is_deleted")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime? @updatedAt @map("updated_at")
