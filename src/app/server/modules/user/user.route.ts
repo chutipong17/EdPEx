@@ -9,5 +9,6 @@ userRouter.get("/:id", controller.getUserById);
 userRouter.post("/search", controller.searchUsers);
 userRouter.patch("/:id", controller.updateUser);
 userRouter.delete("/:id", controller.deleteUser);
+userRouter.get("/department/:id", controller.getUserByDepartment);
 
 export default userRouter;

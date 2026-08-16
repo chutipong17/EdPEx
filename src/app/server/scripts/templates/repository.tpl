@@ -11,7 +11,8 @@ export class {{moduleNamePascal}}Repository {
       return {} as {{moduleNamePascal}};
     } catch (error) {
       customLog.error("Error fetching {{displayName}}", { error });
-      throw new HTTPException(400, { message: "Failed to fetch {{displayName}}" });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to fetch {{displayName}}" });
     }
   }
 }

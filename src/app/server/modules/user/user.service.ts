@@ -76,4 +76,15 @@ export class UserService {
       throw new HTTPException(status, { message: `${error}` || "Deleting user failed" });
     }
   }
+
+  async getUserByDepartment(departmentId: number): Promise<User[]> {
+    try {
+      customLog.info("Getting users by department service");
+      return this.userRepository.getUserByDepartment(departmentId);
+    } catch (error) {
+      const status = error instanceof HTTPException ? error.status : 500;
+      customLog.error("Error getting users by department: ", { message: `${error}` || "Getting users by department failed" });
+      throw new HTTPException(status, { message: `${error}` || "Failed to get users by department" });
+    }
+  }
 }
