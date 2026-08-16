@@ -11,8 +11,8 @@ npx prisma migrate deploy
 echo "Running seed database..."
 npx prisma db seed
 
-echo "Starting application..."
-npm start
+# echo "Starting application..."
+# npm start
 
 echo "✅ Migration completed successfully"
 echo "========== END MIGRATION =========="
