@@ -10,6 +10,35 @@ export class KpiRepository {
     try {
       return await this.prisma.kpi.findMany({
         where: { isDeleted: false },
+        include: {
+          kpiCategory: true,
+          frequency: true,
+          monthOfDelivery: true,
+          targetCondition: true,
+          kpiComparison: {
+            where: {
+              isDeleted: false,
+            },
+            orderBy: {
+              seq: "asc",
+            },
+          },
+          kpiAssignment: {
+            where: {
+              isDeleted: false,
+              include: {
+                kpiSubmission: {
+                  where: {
+                    isDeleted: false,
+                    include: {
+                      kpiSubmissionStatus: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
     } catch (error) {
       customLog.error("Error fetching kpi", { error });
@@ -27,7 +56,37 @@ export class KpiRepository {
           // userId,
         },
         include: {
-          kpi: true,
+          kpi: {
+            include: {
+              kpiCategory: true,
+              frequency: true,
+              monthOfDelivery: true,
+              targetCondition: true,
+              kpiComparison: {
+                where: {
+                  isDeleted: false,
+                },
+                orderBy: {
+                  seq: "asc",
+                },
+              },
+              kpiAssignment: {
+                where: {
+                  isDeleted: false,
+                  include: {
+                    kpiSubmission: {
+                      where: {
+                        isDeleted: false,
+                        include: {
+                          kpiSubmissionStatus: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         orderBy: {
           kpi: {
@@ -68,6 +127,16 @@ export class KpiRepository {
               kpiAssignment: {
                 where: {
                   isDeleted: false,
+                  include: {
+                    kpiSubmission: {
+                      where: {
+                        isDeleted: false,
+                        include: {
+                          kpiSubmissionStatus: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
