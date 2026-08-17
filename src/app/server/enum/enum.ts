@@ -14,3 +14,8 @@ export enum Permission {
 export enum Organization {
   UBRU = 'UBRU',
 }
+
+export enum KpiSubmissionStatus {
+  PENDING = 1,
+  SUBMITTED = 2
+}

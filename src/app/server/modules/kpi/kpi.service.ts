@@ -4,6 +4,7 @@ import { KpiRepository } from "./kpi.repository";
 import { HTTPException } from "hono/http-exception";
 import { KpiDto } from "../../dto/kpi.dto";
 import prismaInstance from "../../config/prismaClientInstance";
+import { KpiSubmissionStatus } from "../../enum/enum";
 
 export class KpiService {
   private readonly prisma = prismaInstance;
@@ -109,6 +110,16 @@ export class KpiService {
             updatedBy: updateBy,
             createdAt: now,
             updatedAt: now,
+            kpiSubmission: {
+              create: {
+                statusId: KpiSubmissionStatus.PENDING,
+                isDeleted: false,
+                createdBy: updateBy,
+                updatedBy: updateBy,
+                createdAt: now,
+                updatedAt: now,
+              },
+            },
           },
         },
       };
