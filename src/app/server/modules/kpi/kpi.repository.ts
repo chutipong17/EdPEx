@@ -1,14 +1,14 @@
 import prismaInstance from "@/app/server/config/prismaClientInstance";
 import { customLog } from "@/app/server/util/custom-log";
-import { Kpi, Prisma } from "@prisma/client";
+import { Kpi, KpiSubmission, Prisma } from "@prisma/client";
 import { HTTPException } from "hono/http-exception";
 
 export class KpiRepository {
   private readonly prisma = prismaInstance;
 
-  async getKpi(): Promise<Kpi[]> {
+  async getKpi() {
     try {
-      return await this.prisma.kpi.findMany({
+      const kpi = await this.prisma.kpi.findMany({
         where: { isDeleted: false },
         include: {
           kpiCategory: true,
@@ -38,8 +38,32 @@ export class KpiRepository {
               },
             },
           },
+          kpiTarget: {
+            where: {
+              isDeleted: false,
+            },
+            include: {
+              department: true,
+              user: true,
+            },
+          },
         },
       });
+
+      const data = kpi.map((kpiItem) => {
+        const target = kpiItem.kpiTarget[0];
+
+        return {
+          ...kpiItem,
+          userId: target?.user?.id ?? null,
+          firstName: target?.user?.firstName ?? null,
+          lastName: target?.user?.lastName ?? null,
+          departmentId: target?.department?.id ?? null,
+          departmentName: target?.department?.departmentName ?? null,
+        };
+      });
+
+      return data;
     } catch (error) {
       customLog.error("Error fetching kpi", { error });
       const status = error instanceof HTTPException ? error.status : 500;
@@ -47,7 +71,7 @@ export class KpiRepository {
     }
   }
 
-  async getKpiByDepartment(departmentId: number): Promise<Kpi[]> {
+  async getKpiByDepartment(departmentId: number) {
     try {
       const kpiTargets = await this.prisma.kpiTarget.findMany({
         where: {
@@ -73,20 +97,22 @@ export class KpiRepository {
               kpiAssignment: {
                 where: {
                   isDeleted: false,
-                  include: {
-                    kpiSubmission: {
-                      where: {
-                        isDeleted: false,
-                        include: {
-                          kpiSubmissionStatus: true,
-                        },
-                      },
+                },
+                include: {
+                  kpiSubmission: {
+                    where: {
+                      isDeleted: false,
+                    },
+                    include: {
+                      status: true,
                     },
                   },
                 },
               },
             },
           },
+          department: true,
+          user: true
         },
         orderBy: {
           kpi: {
@@ -94,7 +120,18 @@ export class KpiRepository {
           },
         },
       });
-      return kpiTargets.map((target) => target.kpi);
+
+      const data = kpiTargets.map(({ user, department, ...kpiItem }) => ({
+        ...kpiItem,
+        userId: user?.id ?? null,
+        firstName: user?.firstName ?? null,
+        lastName: user?.lastName ?? null,
+        departmentId: department?.id ?? null,
+        departmentName: department?.departmentName ?? null,
+      }));
+
+      return data;
+      // return kpiTargets.map((target) => target.kpi);
     } catch (error) {
       customLog.error("Error fetching kpi by department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
@@ -102,7 +139,7 @@ export class KpiRepository {
     }
   }
 
-  async getKpiById(id: number): Promise<Kpi> {
+  async getKpiById(id: number) {
     try {
       const kpiTargets = await this.prisma.kpiTarget.findUnique({
         where: {
@@ -127,23 +164,41 @@ export class KpiRepository {
               kpiAssignment: {
                 where: {
                   isDeleted: false,
-                  include: {
-                    kpiSubmission: {
-                      where: {
-                        isDeleted: false,
-                        include: {
-                          kpiSubmissionStatus: true,
-                        },
-                      },
+                },
+                include: {
+                  kpiSubmission: {
+                    where: {
+                      isDeleted: false,
+                    },
+                    include: {
+                      status: true,
                     },
                   },
                 },
               },
             },
           },
+          department: true,
+          user: true
         },
       });
-      return kpiTargets!.kpi;
+
+      if (!kpiTargets) {
+        return null;
+      }
+
+      const { user, department, ...rest } = kpiTargets;
+
+      return {
+        ...rest,
+        userId: user?.id ?? null,
+        firstName: user?.firstName ?? null,
+        lastName: user?.lastName ?? null,
+        departmentId: department?.id ?? null,
+        departmentName: department?.departmentName ?? null,
+      };
+      
+      // return kpiTargets!.kpi;
     } catch (error) {
       customLog.error("Error fetching kpi by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
@@ -297,6 +352,22 @@ export class KpiRepository {
       customLog.error("Error deleting kpi", { error });
       const status = error instanceof HTTPException ? error.status : 500;
       throw new HTTPException(status, { message: "Failed to delete kpi" });
+    }
+  }
+
+  async updateKpiSubmission( 
+    kpiData: Prisma.KpiSubmissionUpdateInput,
+    id: number
+  ): Promise<KpiSubmission> {
+    try {
+      return await this.prisma.kpiSubmission.update({
+        where: { id, isDeleted: false },
+        data: kpiData,
+      });
+    } catch (error) {
+      customLog.error("Error updating kpi submission", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      throw new HTTPException(status, { message: "Failed to update kpi submission" });
     }
   }
 }

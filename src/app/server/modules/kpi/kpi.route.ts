@@ -9,6 +9,7 @@ kpiRouter.get("/", controller.getKpi);
 kpiRouter.get("/:id", controller.getKpiById);
 kpiRouter.get("/department/:departmentId", controller.getKpiByDepartment);
 kpiRouter.delete("/:id", controller.deleteKpi);
+kpiRouter.patch("/:id/kpi-submission", controller.updateKpiSubmission);
 kpiRouter.post(
   "/",
   kpiValidator,

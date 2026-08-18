@@ -8,6 +8,9 @@ set -e
 echo "Running migrations..."
 npx prisma migrate deploy
 
+echo "Running generate prisma client..."
+npx prisma generate
+
 echo "Running seed database..."
 npx prisma db seed
 

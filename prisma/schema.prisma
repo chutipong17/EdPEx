@@ -150,7 +150,7 @@ model Kpi {
   kpiCode           String    @map("kpi_code")     @db.VarChar(255)
   kpiName           String    @map("kpi_name")     @db.NVarChar(255)
   description       String?   @map("description")  @db.NVarChar(Max)
-  unit              String    @map("unit")         @db.VarChar(100)
+  unit              String    @map("unit")         @db.NVarChar(255)
   year              Int       @map("year")
   targetValue       Decimal   @map("target_value") @db.Decimal(5, 2)
   isActive          Boolean   @default(false) @map("is_active")
