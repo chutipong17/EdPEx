@@ -2,14 +2,9 @@ import { z } from "zod";
 
 const KpiComparison = z.object({
   id: z.number().optional(),
-  kpiCategoryId: z.number().int(),
   seq: z.number().int(),
   name: z.string().max(255),
   result: z.string().max(255).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  createdBy: z.string(),
-  updatedBy: z.string(),
 });
 
 export const KpiDto = z.object({
