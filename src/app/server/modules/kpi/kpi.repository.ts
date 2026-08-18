@@ -26,14 +26,14 @@ export class KpiRepository {
           kpiAssignment: {
             where: {
               isDeleted: false,
-              include: {
-                kpiSubmission: {
-                  where: {
-                    isDeleted: false,
-                    include: {
-                      kpiSubmissionStatus: true,
-                    },
-                  },
+            },
+            include: {
+              kpiSubmission: {
+                where: {
+                  isDeleted: false,
+                },
+                include: {
+                  status: true,
                 },
               },
             },
