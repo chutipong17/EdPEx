@@ -1,10 +1,12 @@
 import { customLog } from "@/app/server/util/custom-log";
-import { Kpi, Prisma } from "@prisma/client";
+import { Kpi, KpiSubmission, Prisma } from "@prisma/client";
 import { KpiRepository } from "./kpi.repository";
 import { HTTPException } from "hono/http-exception";
 import { KpiDto } from "../../dto/kpi.dto";
 import prismaInstance from "../../config/prismaClientInstance";
 import { KpiSubmissionStatus } from "../../enum/enum";
+import { buildUpdateData, toDecimalUpdate } from "../../util/common";
+import { KpiSubmissionDto } from "../../dto/kpi-submission.dto";
 
 export class KpiService {
   private readonly prisma = prismaInstance;
@@ -22,7 +24,7 @@ export class KpiService {
     }
   }
 
-  async getKpiByDepartment(departmentId: number): Promise<Kpi[]> {
+  async getKpiByDepartment(departmentId: number) {
     try {
       return await this.kpiRepository.getKpiByDepartment(departmentId);
     } catch (error) {
@@ -33,7 +35,7 @@ export class KpiService {
     }
   }
 
-  async getKpiById(id: number): Promise<Kpi> {
+  async getKpiById(id: number) {
     try {
       return await this.kpiRepository.getKpiById(id);
     } catch (error) {
@@ -133,7 +135,7 @@ export class KpiService {
     }
   }
 
-  async updateKpi(id: number, kpi: KpiDto, updateBy: string): Promise<Kpi> {
+  async updateKpi(id: number, kpi: KpiDto, updateBy: string) {
     try {
       const now = new Date();
       const kpiData: Prisma.KpiUpdateInput = {
@@ -237,6 +239,48 @@ export class KpiService {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Deleting kpi failed";
       customLog.error("Error deleting kpi: ", { message: errorMessage });
+      throw new HTTPException(status, { message: errorMessage });
+    }
+  }
+
+  async updateKpiSubmission(id: number, data: KpiSubmissionDto, updatedBy: string): Promise<KpiSubmission> {
+    try {
+      const now = new Date();
+      const updatedName = updatedBy || "system";
+
+      const kpiTerget = await this.kpiRepository.getKpiById(id);
+
+      const kpiAssignment = kpiTerget?.kpi?.kpiAssignment?.find(
+        (assignment) => assignment.kpiId === id
+      );
+
+      const kpiSubmission = kpiAssignment?.kpiSubmission;
+
+      if (!kpiSubmission) {
+        throw new HTTPException(404, { message: "KPI submission not found" });
+      }
+
+      const kpiSubmissionId = kpiSubmission[0]?.id;
+      const parsed = KpiSubmissionDto.parse(data);
+      const kpiSubmissionData: Prisma.KpiSubmissionUpdateInput = {
+        status: {
+          connect: { id: KpiSubmissionStatus.SUBMITTED },
+        },
+        submittedBy: buildUpdateData(updatedName),
+        submittedDate: buildUpdateData(now),
+        description: buildUpdateData(parsed.description),
+        actualValue: toDecimalUpdate(parsed.actualValue),
+        calculatedScore: toDecimalUpdate(parsed.calculatedScore),
+        achievementPercent: toDecimalUpdate(parsed.achievementPercent),
+        updatedBy: buildUpdateData(updatedName),
+        updatedAt: now,
+      };
+
+      return await this.kpiRepository.updateKpiSubmission(kpiSubmissionData, kpiSubmissionId);
+    } catch (error) {
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? error.message : "Updating kpi submission failed";
+      customLog.error("Error updating kpi submission: ", { message: errorMessage });
       throw new HTTPException(status, { message: errorMessage });
     }
   }

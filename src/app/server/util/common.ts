@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 
 /**
  * Recursively converts BigInt values to strings in an object or array.
@@ -129,4 +130,13 @@ export function convertErrorMessage(value: string): string | null {
 
 export function calculateTokenExpiryDate(tokenExpiry: number): Date {
   return new Date(Date.now() + tokenExpiry * 1000);
+}
+
+export function buildUpdateData<T>(value: T | undefined): { set: T } | undefined {
+    return value !== undefined ? { set: value } : undefined;
+  }
+
+export function toDecimalUpdate(value: number | null | undefined) {
+  if (value === undefined) return undefined;
+  return { set: value === null ? null : new Prisma.Decimal(value) };
 }

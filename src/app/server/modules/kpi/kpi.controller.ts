@@ -4,6 +4,7 @@ import { customLog } from "@/app/server/util/custom-log";
 import { HTTPException } from "hono/http-exception";
 import { convertErrorMessage } from "../../util/common";
 import { KpiDto } from "../../dto/kpi.dto";
+import { KpiSubmissionDto } from "../../dto/kpi-submission.dto";
 
 export class KpiController {
   constructor(
@@ -144,6 +145,37 @@ export class KpiController {
         {
           success: false,
           error: { message: error instanceof Error ? convertErrorMessage(error.message) : "deleting KPI failed" },
+        },
+        status,
+      );
+    }
+  };
+
+  updateKpiSubmission = async (c: Context) => {
+    try {
+      const id = Number(c.req.param("id"));
+      const fullName = c.get("fullName");
+      const body = await c.req.json();
+      const parsed = KpiSubmissionDto.safeParse(body);
+      if (!parsed.success) {
+        throw new HTTPException(400, { message: "Invalid request data" });
+      }
+      const kpiSubmissionDto = parsed.data;
+      const kpiSubmission = await this.kpiService.updateKpiSubmission(id, kpiSubmissionDto, fullName);
+
+      customLog.info("KPI submission updated :", { kpiSubmission });
+
+      return c.json({
+        success: true,
+        data: kpiSubmission,
+      }, 200);
+    } catch (error) {
+      customLog.error("Error updating KPI submission", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      return c.json(
+        {
+          success: false,
+          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating KPI submission failed" },
         },
         status,
       );
