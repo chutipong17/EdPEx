@@ -1,6 +1,7 @@
 import { ApproveStatusService } from "./approve-status.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
 
 export class ApproveStatusController {
   constructor(
@@ -17,12 +18,14 @@ export class ApproveStatusController {
       });
     } catch (error) {
       customLog.error("Error getting approval status", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting approval status failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "approval status failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };

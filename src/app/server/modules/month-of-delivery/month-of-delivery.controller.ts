@@ -1,6 +1,7 @@
 import { MonthOfDeliveryService } from "./month-of-delivery.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
 
 export class MonthOfDeliveryController {
   constructor(
@@ -17,12 +18,14 @@ export class MonthOfDeliveryController {
       });
     } catch (error) {
       customLog.error("Error getting month of delivery", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting month of delivery failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "month of delivery failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };

@@ -141,10 +141,10 @@ export class KpiRepository {
 
   async getKpiById(id: number) {
     try {
-      const kpiTargets = await this.prisma.kpiTarget.findUnique({
+      const kpiTargets = await this.prisma.kpiTarget.findFirst({
         where: {
           isDeleted: false,
-          id,
+          kpiId: id,
         },
         include: {
           kpi: {

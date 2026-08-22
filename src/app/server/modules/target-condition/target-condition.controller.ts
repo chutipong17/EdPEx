@@ -19,10 +19,11 @@ export class TargetConditionController {
     } catch (error) {
       customLog.error("Error getting target condition", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting target condition failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "target condition failed" },
+          error: { message: errorMessage },
         },
         status,
       );

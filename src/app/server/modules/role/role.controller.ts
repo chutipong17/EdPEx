@@ -1,6 +1,7 @@
 import { RoleService } from "./role.service";
 import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { HTTPException } from "hono/http-exception";
 
 export class RoleController {
   constructor(
@@ -17,12 +18,14 @@ export class RoleController {
       });
     } catch (error) {
       customLog.error("Error getting role", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting role failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "role failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };

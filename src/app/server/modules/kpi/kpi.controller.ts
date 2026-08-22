@@ -1,10 +1,9 @@
-import { KpiService } from "./kpi.service";
-import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { convertErrorMessage } from "../../util/common";
-import { KpiDto } from "../../dto/kpi.dto";
 import { KpiSubmissionDto } from "../../dto/kpi-submission.dto";
+import { KpiDto } from "../../dto/kpi.dto";
+import { KpiService } from "./kpi.service";
 
 export class KpiController {
   constructor(
@@ -20,12 +19,13 @@ export class KpiController {
         data: kpi,
       });
     } catch (error) {
-      customLog.error("Error getting kpi", { error });
+      customLog.error("Error getting KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -34,7 +34,6 @@ export class KpiController {
 
   getKpiByDepartment = async (c: Context) => {
     try {
-      // const userId = Number(c.req.param("userId"));
       const departmentId = Number(c.req.param("departmentId"));
       const kpi = await this.kpiService.getKpiByDepartment(departmentId);
 
@@ -43,12 +42,13 @@ export class KpiController {
         data: kpi,
       });
     } catch (error) {
-      customLog.error("Error getting kpi by department", { error });
+      customLog.error("Error getting KPI by department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI by department failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi by department failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -65,12 +65,13 @@ export class KpiController {
         data: kpi,
       });
     } catch (error) {
-      customLog.error("Error getting kpi by ID", { error });
+      customLog.error("Error getting KPI by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI by ID failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi by ID failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -89,12 +90,13 @@ export class KpiController {
         message: "KPI created successfully",
       }, 201);
     } catch (error) {
-      customLog.error("Error creating KPI transaction", { error });
+      customLog.error("Error creating KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Creating KPI failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "creating KPI transaction failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -116,10 +118,11 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error updating KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Updating KPI failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating KPI failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -141,10 +144,11 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error deleting KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Deleting KPI failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "deleting KPI failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -172,10 +176,11 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error updating KPI submission", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof HTTPException ? error.message : "Updating KPI submission failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating KPI submission failed" },
+          error: { message: errorMessage },
         },
         status,
       );
