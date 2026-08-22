@@ -20,7 +20,7 @@ export class {{moduleNamePascal}}Controller {
     } catch (error) {
       customLog.error("Error getting {{displayName}}", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting {{displayName}} failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting {{displayName}} failed";
       return c.json(
         {
           success: false,

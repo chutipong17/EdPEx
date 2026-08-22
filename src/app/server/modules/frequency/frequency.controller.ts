@@ -19,7 +19,7 @@ export class FrequencyController {
     } catch (error) {
       customLog.error("Error getting frequency", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting frequency failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting frequency failed";
       return c.json(
         {
           success: false,

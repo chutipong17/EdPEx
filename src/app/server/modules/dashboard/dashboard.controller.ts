@@ -27,7 +27,7 @@ export class DashboardController {
     } catch (error) {
       customLog.error("Error getting dashboard", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting dashboard failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting dashboard failed";
       return c.json(
         {
           success: false,

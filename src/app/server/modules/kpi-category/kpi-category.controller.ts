@@ -20,7 +20,7 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error getting KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting KPI category failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting KPI category failed";
       return c.json(
         {
           success: false,
@@ -43,7 +43,7 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error getting KPI category by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting KPI category by ID failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting KPI category by ID failed";
       return c.json(
         {
           success: false,
@@ -69,7 +69,7 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error creating KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Creating KPI category failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Creating KPI category failed";
       return c.json(
         {
           success: false,
@@ -96,7 +96,7 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error updating KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Updating KPI category failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Updating KPI category failed";
       return c.json(
         {
           success: false,
@@ -122,7 +122,7 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error deleting KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Deleting KPI category failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Deleting KPI category failed";
       return c.json(
         {
           success: false,

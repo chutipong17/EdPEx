@@ -19,7 +19,7 @@ export class ApproveStatusController {
     } catch (error) {
       customLog.error("Error getting approval status", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting approval status failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting approval status failed";
       return c.json(
         {
           success: false,

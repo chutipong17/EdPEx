@@ -21,7 +21,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error getting KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting KPI failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI failed";
       return c.json(
         {
           success: false,
@@ -44,7 +44,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error getting KPI by department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting KPI by department failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI by department failed";
       return c.json(
         {
           success: false,
@@ -67,7 +67,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error getting KPI by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting KPI by ID failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting KPI by ID failed";
       return c.json(
         {
           success: false,
@@ -92,7 +92,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error creating KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Creating KPI failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Creating KPI failed";
       return c.json(
         {
           success: false,
@@ -118,7 +118,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error updating KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Updating KPI failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Updating KPI failed";
       return c.json(
         {
           success: false,
@@ -144,7 +144,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error deleting KPI", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Deleting KPI failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Deleting KPI failed";
       return c.json(
         {
           success: false,
@@ -176,7 +176,7 @@ export class KpiController {
     } catch (error) {
       customLog.error("Error updating KPI submission", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Updating KPI submission failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Updating KPI submission failed";
       return c.json(
         {
           success: false,

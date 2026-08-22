@@ -19,7 +19,7 @@ export class MonthOfDeliveryController {
     } catch (error) {
       customLog.error("Error getting month of delivery", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting month of delivery failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting month of delivery failed";
       return c.json(
         {
           success: false,

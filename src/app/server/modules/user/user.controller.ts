@@ -22,7 +22,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error getting user by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting user by ID failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting user by ID failed";
       return c.json(
         {
           success: false,
@@ -44,7 +44,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error getting all users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Getting all users failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Getting all users failed";
       return c.json(
         {
           success: false,
@@ -68,7 +68,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error searching users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? error.message : "Searching users failed";
+      const errorMessage = error instanceof HTTPException ? error.message : "Searching users failed";
       return c.json(
         {
           success: false,
@@ -100,7 +100,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error updating user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Updating user failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Updating user failed";
       return c.json(
         {
           success: false,
@@ -126,7 +126,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error deleting user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Deleting user failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Deleting user failed";
       return c.json(
         {
           success: false,
@@ -149,7 +149,7 @@ export class UserController {
     } catch (error) {
       customLog.error("Error getting users by department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting users by department failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting users by department failed";
       return c.json(
         {
           success: false,

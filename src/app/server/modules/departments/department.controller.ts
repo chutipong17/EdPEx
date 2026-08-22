@@ -21,7 +21,7 @@ export class DepartmentController {
     } catch (error) {
       customLog.error("Error getting department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting department failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting department failed";
       return c.json(
         {
           success: false,
@@ -44,7 +44,7 @@ export class DepartmentController {
     } catch (error) {
       customLog.error("Error getting department by ID", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting department by ID failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Getting department by ID failed";
       return c.json(
         {
           success: false,
@@ -69,7 +69,7 @@ export class DepartmentController {
     } catch (error) {
       customLog.error("Error creating department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Creating department failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Creating department failed";
       return c.json(
         {
           success: false,
@@ -94,7 +94,7 @@ export class DepartmentController {
     } catch (error) {
       customLog.error("Error updating department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Updating department failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Updating department failed";
       return c.json(
         {
           success: false,
@@ -119,7 +119,7 @@ export class DepartmentController {
     } catch (error) {
       customLog.error("Error deleting department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
-      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Deleting department failed";
+      const errorMessage = error instanceof HTTPException ? convertErrorMessage(error.message) : "Deleting department failed";
       return c.json(
         {
           success: false,
