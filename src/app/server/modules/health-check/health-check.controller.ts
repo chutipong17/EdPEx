@@ -1,6 +1,7 @@
 import { customLog } from "@/app/server/util/custom-log";
 import { HealthCheckService } from "./health-check.service";
 import { Context } from "hono";
+import { HTTPException } from "hono/http-exception";
 
 export class HealthCheckController {
   constructor(private readonly healthCheckService = new HealthCheckService()) {}
@@ -15,12 +16,14 @@ export class HealthCheckController {
       });
     } catch (error) {
       customLog.error("Error getting health check", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? error.message : "Getting health check failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "Health check failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };

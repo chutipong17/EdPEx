@@ -18,13 +18,15 @@ export class KpiCategoryController {
         data: kpiCategory,
       });
     } catch (error) {
-      customLog.error("Error getting kpi category", { error });
+      customLog.error("Error getting KPI category", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting KPI category failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi category failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };
@@ -39,13 +41,15 @@ export class KpiCategoryController {
         data: kpiCategory,
       });
     } catch (error) {
-      customLog.error("Error getting kpi category by ID", { error });
+      customLog.error("Error getting KPI category by ID", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting KPI category by ID failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "kpi category by ID failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };
@@ -65,10 +69,11 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error creating KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Creating KPI category failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "creating KPI category failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -91,10 +96,11 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error updating KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Updating KPI category failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating KPI category failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -116,10 +122,11 @@ export class KpiCategoryController {
     } catch (error) {
       customLog.error("Error deleting KPI category", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Deleting KPI category failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "deleting KPI category failed" },
+          error: { message: errorMessage },
         },
         status,
       );

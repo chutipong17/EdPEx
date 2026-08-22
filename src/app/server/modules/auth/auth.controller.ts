@@ -23,12 +23,14 @@ export class AuthController {
       });
     } catch (error) {
       customLog.error("Error getting auth", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting auth failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "auth failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };
@@ -47,10 +49,11 @@ export class AuthController {
     } catch (error) {
       customLog.error("Error signing up user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Signing up user failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -78,10 +81,11 @@ export class AuthController {
     } catch (error) {
       customLog.error("Error signing in user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Signing in user failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -111,10 +115,11 @@ export class AuthController {
     } catch (error) {
       customLog.error("Error signing out user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Signing out user failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -133,10 +138,11 @@ export class AuthController {
     } catch (error) {
       customLog.error("Error changing password", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Changing password failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "auth failed" },
+          error: { message: errorMessage },
         },
         status,
       );

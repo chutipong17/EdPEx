@@ -20,13 +20,15 @@ export class UserController {
         data: user,
       });
     } catch (error) {
-      customLog.error("Error getting user", { error });
+      customLog.error("Error getting user by ID", { error });
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting user by ID failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "user failed" },
+          error: { message: errorMessage },
         },
-        400,
+        status,
       );
     }
   };
@@ -42,10 +44,11 @@ export class UserController {
     } catch (error) {
       customLog.error("Error getting all users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? error.message : "Getting all users failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "Getting all users failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -65,10 +68,11 @@ export class UserController {
     } catch (error) {
       customLog.error("Error searching users", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? error.message : "Searching users failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? error.message : "Searching users failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -96,10 +100,11 @@ export class UserController {
     } catch (error) {
       customLog.error("Error updating user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Updating user failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "updating user failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -121,10 +126,11 @@ export class UserController {
     } catch (error) {
       customLog.error("Error deleting user", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Deleting user failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "deleting user failed" },
+          error: { message: errorMessage },
         },
         status,
       );
@@ -143,10 +149,11 @@ export class UserController {
     } catch (error) {
       customLog.error("Error getting users by department", { error });
       const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? convertErrorMessage(error.message) : "Getting users by department failed";
       return c.json(
         {
           success: false,
-          error: { message: error instanceof Error ? convertErrorMessage(error.message) : "Getting users by department failed" },
+          error: { message: errorMessage },
         },
         status,
       );
