@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Controller, useFormContext } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form";
 
-import { Field, FieldLabel, FieldError } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,18 +11,30 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { FormSection } from "./form-section"
-import { RequiredMark } from "./required-mark"
-import { COLLECTION_PERIODS, TARGET_CONDITIONS } from "@/types/indicator-Edpx"
-import type { IndicatorFormValues } from "@/lib/indicator-schema"
-
+} from "@/components/ui/select";
+import { FormSection } from "./form-section";
+import { RequiredMark } from "./required-mark";
+import { COLLECTION_PERIODS, TARGET_CONDITIONS } from "@/types/indicator-Edpx";
+import type { IndicatorFormValues } from "@/lib/indicator-schema";
+import { useGetTargetCondition } from "@/service/target-condition/target-condition";
+import { useGetFrequency } from "@/service/requency/frequency";
 export function IndicatorTargetSection() {
   const {
     control,
     register,
     formState: { errors },
-  } = useFormContext<IndicatorFormValues>()
+  } = useFormContext<IndicatorFormValues>();
+
+  const { data: targetCondition, isLoading, error } = useGetTargetCondition();
+  console.log("targetCondition ==", targetCondition);
+
+  const {
+    data: frequency,
+    isLoading: frequencyLoading,
+    error: frequencyError,
+  } = useGetFrequency();
+
+  console.log("frequency ===", frequency);
 
   return (
     <FormSection
@@ -34,34 +46,48 @@ export function IndicatorTargetSection() {
       <Controller
         control={control}
         name="targetCondition"
-        render={({ field }) => (
-          <Field data-invalid={!!errors.targetCondition}>
-            <FieldLabel htmlFor="targetCondition">
-              เงื่อนไขเป้าหมาย <RequiredMark />
-            </FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger
-                id="targetCondition"
-                className="h-10 w-full"
-                aria-invalid={!!errors.targetCondition}
-              >
-                <SelectValue placeholder="เลือกเงื่อนไข" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {TARGET_CONDITIONS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <FieldError errors={[errors.targetCondition]} />
-          </Field>
-        )}
-      />
+        render={({ field }) => {
+          const selectedCondition = targetCondition?.data?.find(
+            (item: any) => String(item.id) === String(field.value),
+          );
 
+          return (
+            <Field data-invalid={!!errors.targetCondition}>
+              <FieldLabel htmlFor="targetCondition">
+                เงื่อนไขเป้าหมาย <RequiredMark />
+              </FieldLabel>
+
+              <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="targetCondition"
+                  className="h-10 w-full"
+                  aria-invalid={!!errors.targetCondition}
+                >
+                  <SelectValue placeholder="เลือกเงื่อนไข">
+                    {selectedCondition?.description ?? "เลือกเงื่อนไข"}
+                  </SelectValue>
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectGroup>
+                    {targetCondition?.data?.map((item: any) => (
+                      <SelectItem key={item.id} value={String(item.id)}>
+                        {item.description}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              {errors.targetCondition && (
+                <p className="text-sm text-red-500">
+                  {errors.targetCondition.message as string}
+                </p>
+              )}
+            </Field>
+          );
+        }}
+      />
       <Field data-invalid={!!errors.target}>
         <FieldLabel htmlFor="target">
           เป้าหมาย <RequiredMark />
@@ -95,12 +121,62 @@ export function IndicatorTargetSection() {
       <Controller
         control={control}
         name="collectionPeriod"
+        render={({ field }) => {
+          const selectedFrequency = (frequency?.data ?? []).find(
+            (p: any) => String(p.id) === String(field.value),
+          );
+
+          return (
+            <Field data-invalid={!!errors.collectionPeriod}>
+              <FieldLabel htmlFor="collectionPeriod">
+                ระยะเวลาการเก็บข้อมูล <RequiredMark />
+              </FieldLabel>
+
+              <Select
+                value={field.value ?? ""}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                }}
+              >
+                <SelectTrigger
+                  id="collectionPeriod"
+                  className="h-10 w-full"
+                  aria-invalid={!!errors.collectionPeriod}
+                >
+                  <SelectValue placeholder="เลือกระยะเวลา">
+                    {selectedFrequency
+                      ? selectedFrequency.frequencyName
+                      : "เลือกระยะเวลา"}
+                  </SelectValue>
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectGroup>
+                    {(frequency?.data ?? []).map((p: any) => (
+                      <SelectItem key={p.id} value={String(p.id)}>
+                        {p.frequencyName}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              <FieldError errors={[errors.collectionPeriod]} />
+            </Field>
+          );
+        }}
+      />
+
+      {/* <Controller
+        control={control}
+        name="collectionPeriod"
         render={({ field }) => (
           <Field data-invalid={!!errors.collectionPeriod}>
             <FieldLabel htmlFor="collectionPeriod">
               ระยะเวลาการเก็บข้อมูล <RequiredMark />
             </FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
+
+            <Select value={field.value ?? ""} onValueChange={field.onChange}>
               <SelectTrigger
                 id="collectionPeriod"
                 className="h-10 w-full"
@@ -108,20 +184,22 @@ export function IndicatorTargetSection() {
               >
                 <SelectValue placeholder="เลือกระยะเวลา" />
               </SelectTrigger>
+
               <SelectContent>
                 <SelectGroup>
-                  {COLLECTION_PERIODS.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {p}
+                  {(frequency?.data ?? []).map((p: any) => (
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.frequencyName}
                     </SelectItem>
                   ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
+
             <FieldError errors={[errors.collectionPeriod]} />
           </Field>
         )}
-      />
+      /> */}
     </FormSection>
-  )
+  );
 }

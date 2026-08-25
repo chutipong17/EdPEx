@@ -1,25 +1,26 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Save } from 'lucide-react'
-import { toast } from 'sonner'
-import { resultFormSchema, type ResultFormValues } from '@/lib/validations'
-import type { Indicator } from '@/types/indicators'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
+import { toast } from "sonner";
+import { resultFormSchema, type ResultFormValues } from "@/lib/validations";
+import type { Indicator } from "@/types/indicator-Edpx";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useUpdateKpiSubmission } from "@/service/kpi/kpi";
 
 export function ResultForm({
   indicator,
   onSuccess,
 }: {
-  indicator: Indicator
-  onSuccess: () => void
+  indicator: Indicator;
+  onSuccess: () => void;
 }) {
-  const router = useRouter()
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -27,37 +28,62 @@ export function ResultForm({
   } = useForm<ResultFormValues>({
     resolver: zodResolver(resultFormSchema),
     defaultValues: {
-      resultValue: indicator.resultValue ?? undefined,
-      description: '',
+      resultValue: indicator.result ?? undefined,
+      description: "",
     },
-  })
+  });
+  const { mutateAsync: updateKpiSubmission, isPending } =
+    useUpdateKpiSubmission();
 
   async function onSubmit(values: ResultFormValues) {
-    console.log('[v0] onSubmit fired', values)
-    const res = await fetch('/api/results', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ indicatorId: indicator.id, ...values }),
-    })
+    try {
+      console.log("[v0] onSubmit fired", values, indicator.id);
+      const payload = {
+        description: values.description,
+        actualValue: Number(values.resultValue),
+      };
 
-    if (res.status === 403) {
-      toast.error('ไม่มีสิทธิ์ส่งผลของตัวชี้วัดนี้')
-      return
+      await updateKpiSubmission({
+        id: indicator.id,
+        body: payload,
+      });
+      router.refresh();
+      onSuccess();
+    } catch (error) {
+      console.error(error);
     }
-    if (!res.ok) {
-      toast.error('บันทึกผลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง')
-      return
-    }
+    // console.log("[v0] onSubmit fired", values,indicator.id);
+    // const payload = {
+    //   description: values.description,
+    //   actualValue: Number(values.resultValue),
+    // };
 
-    toast.success('บันทึกผลลัพธ์เรียบร้อยแล้ว')
-    router.refresh()
-    onSuccess()
+    // await updateKpiSubmission({
+    //   id: indicator.id,
+    //   body: payload,
+    // });
+    // const res = await fetch('/api/results', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ indicatorId: indicator.id, ...values }),
+    // })
+
+    // if (res.status === 403) {
+    //   toast.error('ไม่มีสิทธิ์ส่งผลของตัวชี้วัดนี้')
+    //   return
+    // }
+    // if (!res.ok) {
+    //   toast.error('บันทึกผลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง')
+    //   return
+    // }
+
+    // toast.success('บันทึกผลลัพธ์เรียบร้อยแล้ว')
   }
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit, (errs) =>
-        console.log('[v0] validation errors', errs),
+        console.log("[v0] validation errors", errs),
       )}
       className="flex flex-col gap-4"
     >
@@ -75,9 +101,7 @@ export function ResultForm({
             <span className="text-xs font-medium text-muted-foreground md:hidden">
               เวลาส่งมอบ
             </span>
-            <span className="text-sm text-foreground">
-              {indicator.deliveryTime}
-            </span>
+            <span className="text-sm text-foreground">{indicator.months}</span>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -100,10 +124,12 @@ export function ResultForm({
               min={0}
               placeholder="0.00"
               aria-invalid={Boolean(errors.resultValue)}
-              {...register('resultValue', { valueAsNumber: true })}
+              {...register("resultValue", { valueAsNumber: true })}
             />
             {errors.resultValue ? (
-              <p className="text-xs text-danger">{errors.resultValue.message}</p>
+              <p className="text-xs text-danger">
+                {errors.resultValue.message}
+              </p>
             ) : null}
           </div>
 
@@ -116,10 +142,12 @@ export function ResultForm({
               rows={3}
               placeholder="อธิบายที่มาของผลลัพธ์ วิธีการเก็บข้อมูล และข้อสังเกต (อย่างน้อย 10 ตัวอักษร)"
               aria-invalid={Boolean(errors.description)}
-              {...register('description')}
+              {...register("description")}
             />
             {errors.description ? (
-              <p className="text-xs text-danger">{errors.description.message}</p>
+              <p className="text-xs text-danger">
+                {errors.description.message}
+              </p>
             ) : null}
           </div>
         </div>
@@ -132,9 +160,9 @@ export function ResultForm({
           className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto"
         >
           <Save className="size-4" aria-hidden="true" />
-          {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกผล'}
+          {isSubmitting ? "กำลังบันทึก..." : "บันทึกผล"}
         </Button>
       </div>
     </form>
-  )
+  );
 }

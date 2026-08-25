@@ -1,4 +1,8 @@
-export type IndicatorStatus = 'pass' | 'fail' | 'no-data'
+export type IndicatorStatus =
+  | 'pass'
+  | 'fail'
+  | 'no-data'
+
 
 export interface Indicator {
   id: string
@@ -14,6 +18,7 @@ export interface Indicator {
   status: IndicatorStatus
 }
 
+
 export interface KpiSummary {
   total: number
   achieved: number
@@ -21,24 +26,44 @@ export interface KpiSummary {
   noData: number
 }
 
+
 export interface PieDatum {
   name: string
   value: number
   color: string
 }
 
+
+/**
+ * ข้อมูลที่ใช้สำหรับ Recharts
+ *
+ * ไม่กำหนด q1 / q2 แบบตายตัว
+ * เพราะ kpiComparison จาก API สามารถมีได้หลายรายการ
+ *
+ * ตัวอย่าง:
+ *
+ * {
+ *   year: "2568",
+ *   target: 80,
+ *   Q1: 75,
+ *   Q2: 82,
+ *   Q3: 85,
+ *   Q4: 90
+ * }
+ */
 export interface AnalysisDatum {
   year: string
-  ubru: number
   target: number
-  q1: number
-  q2: number
+
+  [key: string]: string | number | null
 }
+
 
 export interface FilterOption {
   label: string
   value: string
 }
+
 
 export interface DashboardFilters {
   year: string

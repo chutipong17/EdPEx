@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   Dialog,
@@ -11,17 +11,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { UserFormFields } from './user-form'
-import { editUserSchema, type EditUserValues } from '@/lib/user-schema'
-import type { User } from '@/types/user'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { UserFormFields } from "./user-form";
+import { editUserSchema, type EditUserValues } from "@/lib/user-schema";
+import type { User } from "@/types/user";
 
 interface EditUserDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  user: User | null
-  onSubmit: (values: EditUserValues) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: User | null;
+  onSubmit: (values: EditUserValues) => void;
 }
 
 export function EditUserDialog({
@@ -33,32 +33,39 @@ export function EditUserDialog({
   const form = useForm<EditUserValues>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
-      department: '',
-      fullname: '',
-      role: 'USER',
-      email: '',
-      phone: '',
-      username: '',
+      departmentId: user?.departmentId || 0,
+      firstName: "",
+      lastName: "",
+      roleId: user?.roleId || 0,
+      email: "",
+      mobileNumber: "",
+      username: "",
+      department:user?.department || "",
+      role:user?.roleNameTh || "",
     },
-  })
+  });
 
   useEffect(() => {
     if (open && user) {
       form.reset({
-        department: user.department === 'ไม่มี' ? '' : user.department,
-        fullname: user.fullname,
-        role: user.role,
+        departmentId: user.departmentId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        roleId: user.roleId,
         email: user.email,
-        phone: user.phone,
+        mobileNumber: user.mobileNumber,
         username: user.username,
-      })
+        department:user.departmentName || "",
+        role:user.roleNameTh || "",
+      });
     }
-  }, [open, user, form])
+  }, [open, user, form]);
+
 
   const handleSubmit = form.handleSubmit((values) => {
-    onSubmit(values)
-    onOpenChange(false)
-  })
+    onSubmit(values);
+    onOpenChange(false);
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -68,7 +75,11 @@ export function EditUserDialog({
             แก้ไขผู้ใช้งาน
           </DialogTitle>
           <DialogDescription>
-            ปรับปรุงข้อมูลของ {user?.fullname ?? 'ผู้ใช้งาน'} ตามต้องการ
+            ปรับปรุงข้อมูลของ{" "}
+            {user?.firstName && user?.lastName
+              ? `${user.firstName} ${user.lastName}`
+              : "ผู้ใช้งาน"}{" "}
+            ตามต้องการ
           </DialogDescription>
         </DialogHeader>
 
@@ -90,5 +101,5 @@ export function EditUserDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

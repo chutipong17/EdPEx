@@ -106,7 +106,7 @@ export function DashboardFilters({
           options={departmentOptions}
           control={control}
         />
-        <SelectField name="branch" label="สาขา" options={branchOptions} control={control} />
+        {/* <SelectField name="branch" label="สาขา" options={branchOptions} control={control} /> */}
 
         <div className="flex items-end">
           <Button type="submit" className="h-10 w-full rounded-xl">

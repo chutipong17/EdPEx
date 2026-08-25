@@ -32,7 +32,7 @@ export async function getUsers(): Promise<User[]> {
   const {
        data: AllUsers,
        isLoading: usersLoading,
-       error: usersError,
+       error: departmentsError,
        refetch: mutate,
      } = useGetAllUsers();
 

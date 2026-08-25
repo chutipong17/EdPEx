@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,11 +29,30 @@ import { UserTable } from "./user-table";
 import { AddUserDialog } from "./add-user-dialog";
 import { EditUserDialog } from "./edit-user-dialog";
 import { ChangePasswordDialog } from "./change-password-dialog";
-import { mockUsers } from "@/lib/mock-users";
+// import { mockUsers } from "@/lib/mock-users";
+import {
+  useGetAllUsers,
+  useCreateUser,
+  useUpdateUser,
+  useDeleteUser,
+  useGetUserById,
+  useChangePassword,
+} from "@/service/user/user";
 import type { User } from "@/types/user";
-import type { AddUserValues, EditUserValues,ChangePasswordValues } from "@/lib/user-schema";
-import { createUser,updateUser,deleteUser,changePassword } from "@/components/serveices/authService";
+import type {
+  AddUserValues,
+  EditUserValues,
+  ChangePasswordValues,
+} from "@/lib/user-schema";
+import {
+  createUser,
+  updateUser,
+  deleteUser,
+  changePassword,
+} from "@/components/serveices/authService";
 const PAGE_SIZE = 5;
+
+
 
 function getPageNumbers(
   current: number,
@@ -53,7 +72,7 @@ function getPageNumbers(
 }
 
 export function UsersPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
@@ -62,12 +81,32 @@ export function UsersPage() {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [activeUser, setActiveUser] = useState<User | null>(null);
+  const { mutateAsync: createUser, isPending } = useCreateUser();
+  const { mutateAsync: updateUserUser } = useUpdateUser();
+  const { mutateAsync: deleteUser } = useDeleteUser();
+  const { mutateAsync: changePasswordUser } = useChangePassword();
 
+  const {
+    data: AllUsers,
+    isLoading: usersLoading,
+    error: usersError,
+    refetch: mutate,
+  } = useGetAllUsers();
+
+  useEffect(() => {
+    setUsers(AllUsers?.data ?? []);
+  }, [AllUsers]);
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return users;
     return users.filter((u) =>
-      [u.username, u.fullname, u.email, u.department, u.phone]
+      [
+        u.username,
+        `${u.firstName} ${u.lastName}`,
+        u.email,
+        u.department,
+        u.mobileNumber,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(q),
@@ -85,109 +124,87 @@ export function UsersPage() {
     setPage(1);
   }
 
-  async function handleAdd(
-  values: AddUserValues
-): Promise<void> {
-  try {
-    // 1. call API
-    const user = await createUser(values)
+  async function handleAdd(values: AddUserValues): Promise<void> {
+    try {
+      const payload = {
+        ...values,
+        department: Number(values.department), // Convert department to number
+        role: Number(values.role), // Convert role to number
+      };
+      const response = await createUser({
+        body: payload,
+      });
 
-    // 2. update state จาก API response (ดีที่สุด)
-    setUsers((prev) => [user, ...prev])
+      console.log("response:", response);
 
-    toast.success('เพิ่มผู้ใช้งานสำเร็จ', {
-      description: `เพิ่ม ${user.fullname} เข้าสู่ระบบแล้ว`,
-    })
-  } catch (error) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : 'ไม่สามารถเพิ่มผู้ใช้งานได้'
-    )
+      const result = await response.json();
 
-    throw error
+      if (!response.ok) {
+        throw new Error(result.message || "ไม่สามารถเพิ่มผู้ใช้งานได้");
+      }
+
+      toast.success("เพิ่มผู้ใช้งานสำเร็จ");
+
+      setAddOpen(false);
+
+      // ถ้ามี state users
+      setUsers((prev) => [result.data, ...prev]);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "ไม่สามารถเพิ่มผู้ใช้งานได้",
+      );
+    }
   }
-}
-// async function handleAdd(
-//   values: AddUserValues
-// ): Promise<void> {
-//   try {
-//     // await registerUser(values)
 
-//     const newUser: User = {
-//       id: Math.max(0, ...users.map((u) => u.id)) + 1,
-//       username: values.username,
-//       fullname: values.fullname,
-//       email: values.email,
-//       department: values.department,
-//       phone: values.phone,
-//       role: values.role,
-//     }
+  async function handleEdit(values: EditUserValues): Promise<void> {
+    if (!activeUser) return;
 
-//     setUsers((prev) => [newUser, ...prev])
+    try {
+      // await updateUser(activeUser.id, values)
+      console.log("values EDIT === :", values, "  ", activeUser.id);
+      const payload = {
+        departmentId: Number(values.departmentId),
+        roleId: Number(values.roleId),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        mobileNumber: values.mobileNumber,
+        username: values.username,
+      };
 
-//     toast.success('เพิ่มผู้ใช้งานสำเร็จ', {
-//       description: `เพิ่ม ${values.fullname} เข้าสู่ระบบแล้ว`,
-//     })
-//   } catch (error) {
-//     toast.error('ไม่สามารถเพิ่มผู้ใช้งานได้')
-//     throw error
-//   }
-// }
+      await updateUserUser({
+        id: activeUser.id,
+        body: payload,
+      });
 
-//  async function handleAdd(values: AddUserValues) {
-//     const newUser: User = {
-//       id: Math.max(0, ...users.map((u) => u.id)) + 1,
-//       username: values.username,
-//       fullname: values.fullname,
-//       email: values.email,
-//       department: values.department,
-//       phone: values.phone,
-//       role: values.role,
-//     };
-//     setUsers((prev) => [newUser, ...prev]);
-//     toast.success("เพิ่มผู้ใช้งานสำเร็จ", {
-//       description: `เพิ่ม ${values.fullname} เข้าสู่ระบบแล้ว`,
-//     });
-//   }
+      //  const res = await updateUserUser({
+      //   id: activeUser.id,
+      //   body: {
+      //     ...values,
+      //      department: Number(values.department), // Convert department to number
+      //      role: Number(values.role), // Convert role to number
+      //   },
+      // });
+      // setUsers((prev) =>
+      //   prev.map((u) =>
+      //     u.id === activeUser.id
+      //       ? {
+      //           ...u,
+      //           ...values,
+      //         }
+      //       : u
+      //   )
+      // )
 
-  // function handleEdit(values: EditUserValues) {
-  //   if (!activeUser) return;
-  //   setUsers((prev) =>
-  //     prev.map((u) => (u.id === activeUser.id ? { ...u, ...values } : u)),
-  //   );
-  //   toast.success("บันทึกการแก้ไขสำเร็จ", {
-  //     description: `ปรับปรุงข้อมูลของ ${values.fullname} แล้ว`,
-  //   });
-  // }
-async function handleEdit(
-  values: EditUserValues
-): Promise<void> {
-  if (!activeUser) return
+      toast.success("บันทึกการแก้ไขสำเร็จ", {
+        description: `ปรับปรุงข้อมูลของ ${values.firstName} ${values.lastName} แล้ว`,
+      });
+    } catch (error) {
+      toast.error("ไม่สามารถแก้ไขข้อมูลผู้ใช้งานได้");
 
-  try {
-    await updateUser(activeUser.id, values)
-
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === activeUser.id
-          ? {
-              ...u,
-              ...values,
-            }
-          : u
-      )
-    )
-
-    toast.success('บันทึกการแก้ไขสำเร็จ', {
-      description: `ปรับปรุงข้อมูลของ ${values.fullname} แล้ว`,
-    })
-  } catch (error) {
-    toast.error('ไม่สามารถแก้ไขข้อมูลผู้ใช้งานได้')
-
-    throw error
+      throw error;
+    }
   }
-}
 
   // function handleChangePassword() {
   //   toast.success("เปลี่ยนรหัสผ่านสำเร็จ", {
@@ -195,29 +212,34 @@ async function handleEdit(
   //   });
   // }
 
-async function handleChangePassword(
-  values: ChangePasswordValues
-): Promise<void> {
-  if (!activeUser) return
+  async function handleChangePassword(
+    values: ChangePasswordValues,
+  ): Promise<void> {
+    if (!activeUser) return;
 
-  try {
-    await changePassword(activeUser.id, values)
+    try {
+      console.log("values ChangePassword === :", values, "  ", activeUser.id);
+      // await changePassword(activeUser.id, values)
 
-    toast.success('เปลี่ยนรหัสผ่านสำเร็จ', {
-      description: `อัปเดตรหัสผ่านของ ${
-        activeUser.username
-      } แล้ว`,
-    })
-  } catch (error) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : 'ไม่สามารถเปลี่ยนรหัสผ่านได้'
-    )
+      await changePasswordUser({
+        body: {
+          userId: activeUser.id,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+        },
+      });
 
-    throw error
+      toast.success("เปลี่ยนรหัสผ่านสำเร็จ", {
+        description: `อัปเดตรหัสผ่านของ ${activeUser.username} แล้ว`,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "ไม่สามารถเปลี่ยนรหัสผ่านได้",
+      );
+
+      throw error;
+    }
   }
-}
 
   // function handleDelete() {
   //   if (!activeUser) return;
@@ -229,35 +251,29 @@ async function handleChangePassword(
   //   setActiveUser(null);
   // }
 
+  async function handleDelete(): Promise<void> {
+    if (!activeUser) return;
 
+    try {
+      // await deleteUser(activeUser.id)
+      await deleteUser({ id: activeUser.id });
 
-async function handleDelete(): Promise<void> {
-  if (!activeUser) return
+      setUsers((prev) => prev.filter((u) => u.id !== activeUser.id));
 
-  try {
-    await deleteUser(activeUser.id)
+      toast.success("ลบผู้ใช้งานสำเร็จ", {
+        description: `ลบ ${activeUser.username} ออกจากระบบแล้ว`,
+      });
 
-    setUsers((prev) =>
-      prev.filter((u) => u.id !== activeUser.id)
-    )
+      setDeleteOpen(false);
+      setActiveUser(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "ไม่สามารถลบผู้ใช้งานได้",
+      );
 
-    toast.success('ลบผู้ใช้งานสำเร็จ', {
-      description: `ลบ ${activeUser.fullname} ออกจากระบบแล้ว`,
-    })
-
-    setDeleteOpen(false)
-    setActiveUser(null)
-  } catch (error) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : 'ไม่สามารถลบผู้ใช้งานได้'
-    )
-
-    throw error
+      throw error;
+    }
   }
-}
-
 
   function goToPage(p: number) {
     setPage(Math.min(Math.max(1, p), totalPages));
@@ -411,8 +427,8 @@ async function handleDelete(): Promise<void> {
           <AlertDialogHeader>
             <AlertDialogTitle>ยืนยันการลบผู้ใช้งาน</AlertDialogTitle>
             <AlertDialogDescription>
-              คุณต้องการลบ &ldquo;{activeUser?.fullname}&rdquo;
-              ออกจากระบบใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้
+              คุณต้องการลบ &ldquo;{activeUser?.firstName} {activeUser?.lastName}
+              &rdquo; ออกจากระบบใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -18,27 +18,22 @@ import { addUserSchema, type AddUserValues } from '@/lib/user-schema'
 
 const defaultValues: AddUserValues = {
   department: '',
-  fullname: '',
-  role: 'USER',
+  firstName: '',
+  lastName: '',
+  role: '',
   email: '',
-  phone: '',
+  mobileNumber: '',
   username: '',
   password: '',
   confirmPassword: '',
 }
 
+
 interface AddUserDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit: (values: AddUserValues) => void
+  onSubmit: (values: AddUserValues) => Promise<void>
 }
-
-//API
-// interface AddUserDialogProps {
-//   open: boolean
-//   onOpenChange: (open: boolean) => void
-//   onSubmit: (values: AddUserValues) => Promise<void>
-// }
 
 export function AddUserDialog({
   open,
@@ -56,19 +51,26 @@ export function AddUserDialog({
     }
   }, [open, form])
 
-  // const handleSubmit = form.handleSubmit((values) => {
-  //   onSubmit(values)
-  //   onOpenChange(false)
-  // })
-  const handleSubmit = form.handleSubmit(async (values) => {
-  try {
-    await onSubmit(values)
-    form.reset()
-    onOpenChange(false)
-  } catch (error) {
-    console.error(error)
+
+  const handleSubmit = async (values: AddUserValues) => {
+    try {
+    //   const payload = {
+    //   ...values,
+    //   department: Number(values.department), // Convert department to number
+    // };
+
+    // console.log("payload:", payload);
+
+   
+
+      // console.log('handleSubmit values:', values)
+      await onSubmit(values)
+      form.reset(defaultValues)
+      onOpenChange(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
-})
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -82,7 +84,7 @@ export function AddUserDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="p-6">
             <UserFormFields form={form} showPassword />
           </div>
