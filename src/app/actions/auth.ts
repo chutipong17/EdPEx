@@ -56,7 +56,10 @@ export async function login(
   const password = String(formData.get('password') ?? '')
 
   const user = await verifyCredentials(username, password)
-   
+  console.log("========== LOGIN ==========");
+  console.log("USER FROM API/VERIFY:", user);
+  console.log("USER departmentName:", user?.departmentName);
+
   if (!user) {
     return { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }
   }

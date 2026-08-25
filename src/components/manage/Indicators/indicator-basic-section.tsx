@@ -16,7 +16,7 @@ import { FormSection } from "./form-section";
 import { RequiredMark } from "./required-mark";
 import { DATA_YEARS, INDICATOR_TYPES } from "@/types/indicator-Edpx";
 import type { IndicatorFormValues } from "@/lib/indicator-schema";
-import { mockIndicatorTypes } from "@/lib/mock-indicator-types";
+import { useGetKpiCategory } from "@/service/kpi-category/kpi-category";
 export function IndicatorBasicSection() {
   const {
     control,
@@ -24,6 +24,12 @@ export function IndicatorBasicSection() {
     formState: { errors },
   } = useFormContext<IndicatorFormValues>();
 
+  const {
+    data: indicatorTypes,
+    isLoading: indicatorTypesLoading,
+    error: indicatorTypesError,
+  } = useGetKpiCategory();
+  // Fallback to local mock data to avoid dependency on missing service module
   return (
     <FormSection
       step={1}
@@ -65,32 +71,44 @@ export function IndicatorBasicSection() {
       <Controller
         control={control}
         name="indicatorType"
-        render={({ field }) => (
-          <Field data-invalid={!!errors.indicatorType}>
-            <FieldLabel htmlFor="indicatorType">
-              ประเภทตัวชี้วัด <RequiredMark />
-            </FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger
-                id="indicatorType"
-                className="h-10 w-full"
-                aria-invalid={!!errors.indicatorType}
-              >
-                <SelectValue placeholder="เลือกประเภท" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {mockIndicatorTypes.map((t) => (
-                    <SelectItem key={t.id} value={t.id.toString()}>
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <FieldError errors={[errors.indicatorType]} />
-          </Field>
-        )}
+        render={({ field }) => {
+          const selectedRole = indicatorTypes?.data?.find(
+            (indicatorType: any) => String(indicatorType.id) === field.value,
+          );
+
+          return (
+            <Field data-invalid={!!errors.indicatorType}>
+              <FieldLabel htmlFor="indicatorType">
+                ประเภทตัวชี้วัด <RequiredMark />
+              </FieldLabel>
+
+              <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="indicatorType"
+                  className="w-full"
+                  aria-invalid={!!errors.indicatorType}
+                >
+                  <SelectValue placeholder="เลือกประเภทตัวชี้วัด">
+                    {selectedRole?.categoryName}
+                  </SelectValue>
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectGroup>
+                    {indicatorTypes?.data?.map((indicatorType: any) => (
+                      <SelectItem
+                        key={indicatorType.id}
+                        value={String(indicatorType.id)}
+                      >
+                        {indicatorType.categoryName}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+          );
+        }}
       />
 
       <Field data-invalid={!!errors.code}>

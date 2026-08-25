@@ -8,6 +8,7 @@ export default async function UserManage() {
     if (!session) {
       redirect('/login')
     }
+    console.log("session.user.roleNameEn === "+session.user.role);
   
   return (
     <DashboardLayout user={session.user}>

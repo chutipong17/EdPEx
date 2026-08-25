@@ -76,13 +76,18 @@ app.use("*", async (c, next) => {
       c.req.path === "/api/auth/sign-in/" ||
       c.req.path.startsWith("/api/auth/sign-in");
 
+    const isSignUpRoute =
+      c.req.path === "/api/auth/sign-up" ||
+      c.req.path === "/api/auth/sign-up/" ||
+      c.req.path.startsWith("/api/auth/sign-up");
+
     const isHealthCheckRoute =
       c.req.path === "/api/health-check" ||
       c.req.path === "/api/health-check/" ||
       c.req.path.startsWith("/api/health-check");
 
-    if (isSignInRoute || isHealthCheckRoute) {
-      console.info("Sign-in or health check route, skipping auth guard");
+    if (isSignInRoute || isSignUpRoute || isHealthCheckRoute) {
+      console.info("Sign-in or Sign-up or health check route, skipping auth guard");
       return await next();
     }
 

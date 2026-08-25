@@ -18,59 +18,86 @@ import {
 import { IndicatorTable , type SortKey } from "./indicator-table"
 import { TablePagination } from "./table-pagination"
 import type { Indicator } from "@/types/indicator-Edpx"
-
+import { useGetKpi } from "@/service/kpi/kpi"
 const PAGE_SIZE_OPTIONS = ["10", "25", "50", "100"]
 
-export function IndicatorList({ indicators }: { indicators: Indicator[] }) {
+export function IndicatorList() {
   const [search, setSearch] = useState("")
   const [pageSize, setPageSize] = useState("10")
   const [page, setPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey | null>(null)
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
+const {
+  data: kpiResponse,
+  isLoading,
+  error,
+} = useGetKpi();
 
-  const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase()
-    let result = indicators
-    if (term) {
-      result = indicators.filter(
-        (i) =>
-          i.name.toLowerCase().includes(term) ||
-          i.code.toLowerCase().includes(term) ||
-          i.department.toLowerCase().includes(term) ||
-          i.owner.toLowerCase().includes(term) ||
-          i.indicatorType.toLowerCase().includes(term),
-      )
-    }
-    if (sortKey) {
-      result = [...result].sort((a, b) => {
-        const av = a[sortKey]
-        const bv = b[sortKey]
-        if (av == null) return 1
-        if (bv == null) return -1
-        if (typeof av === "number" && typeof bv === "number") {
-          return sortDir === "asc" ? av - bv : bv - av
-        }
-        return sortDir === "asc"
-          ? String(av).localeCompare(String(bv), "th")
-          : String(bv).localeCompare(String(av), "th")
-      })
-    }
-    return result
-  }, [indicators, search, sortKey, sortDir])
+console.log("kpiResponse", kpiResponse);
 
-  const size = Number(pageSize)
-  const totalPages = Math.max(1, Math.ceil(filtered.length / size))
-  const currentPage = Math.min(page, totalPages)
-  const paged = filtered.slice((currentPage - 1) * size, currentPage * size)
+const filtered = useMemo(() => {
+  const term = search.trim().toLowerCase();
 
-  function handleSort(key: SortKey) {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"))
-    } else {
-      setSortKey(key)
-      setSortDir("asc")
-    }
+  // ป้องกัน data ไม่ใช่ array
+  let result = Array.isArray(kpiResponse?.data)
+    ? kpiResponse.data
+    : [];
+
+  if (term) {
+    result = result.filter((i: any) =>
+      String(i.kpiName ?? "").toLowerCase().includes(term) ||
+      String(i.kpiCode ?? "").toLowerCase().includes(term) ||
+      String(i.departmentName ?? "").toLowerCase().includes(term) ||
+      String(i.owner ?? "").toLowerCase().includes(term) ||
+      String(i.indicatorType ?? "").toLowerCase().includes(term)
+    );
   }
+
+  if (sortKey) {
+    result = [...result].sort((a, b) => {
+      const av = a[sortKey];
+      const bv = b[sortKey];
+
+      if (av == null) return 1;
+      if (bv == null) return -1;
+
+      if (typeof av === "number" && typeof bv === "number") {
+        return sortDir === "asc"
+          ? av - bv
+          : bv - av;
+      }
+
+      return sortDir === "asc"
+        ? String(av).localeCompare(String(bv), "th")
+        : String(bv).localeCompare(String(av), "th");
+    });
+  }
+
+  return result;
+}, [kpiResponse, search, sortKey, sortDir]);
+
+const size = Number(pageSize);
+
+const totalPages = Math.max(
+  1,
+  Math.ceil(filtered.length / size)
+);
+
+const currentPage = Math.min(page, totalPages);
+
+const paged = filtered.slice(
+  (currentPage - 1) * size,
+  currentPage * size
+);
+
+function handleSort(key: SortKey) {
+  if (sortKey === key) {
+    setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  } else {
+    setSortKey(key);
+    setSortDir("asc");
+  }
+}
 
   return (
     <div className="flex flex-col gap-5">
@@ -91,14 +118,14 @@ export function IndicatorList({ indicators }: { indicators: Indicator[] }) {
             <Plus data-icon="inline-start" />
             เพิ่มตัวชี้วัด
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             className="h-10 border-warning/40 text-warning hover:bg-warning/10 hover:text-warning"
             onClick={() => toast.success("กำลังส่งออกข้อมูลเป็นไฟล์ Excel")}
           >
             <FileSpreadsheet data-icon="inline-start" />
             Export Excel
-          </Button>
+          </Button> */}
         </div>
       </div>
 
