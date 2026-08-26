@@ -30,11 +30,11 @@ export default async function LoginPage() {
           <LoginForm />
         </div>
 
-        <div className="mt-4 rounded-2xl border border-border bg-card/60 p-4 text-xs text-muted-foreground">
+        {/* <div className="mt-4 rounded-2xl border border-border bg-card/60 p-4 text-xs text-muted-foreground">
           <p className="mb-1 font-medium text-foreground">บัญชีทดสอบ</p>
           <p>ผู้ใช้ 1: user01 / user01</p>
           <p>ผู้ใช้ 2: user02 / user02</p>
-        </div>
+        </div> */}
       </div>
     </main>
   )

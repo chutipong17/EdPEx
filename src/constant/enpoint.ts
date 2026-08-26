@@ -12,6 +12,15 @@ export const API_ENDPOINT = {
     UPDATE: (id: number) => `/api/kpi-category/${id}`,
     DELETE: (id: number) => `/api/kpi-category/${id}`,
   },
+  
+   KPI: {
+    GET_ALL: "/api/kpi",
+    GET_BY_ID: (id: number) => `/api/kpi/${id}`,
+    CREATE: "/api/kpi",
+    UPDATE: (id: number) => `/api/kpi/${id}`,
+    DELETE: (id: number) => `/api/kpi/${id}`,
+  },
+
    DEPARTMENT: {
     GET_ALL: "/api/department",
     GET_BY_ID: (id: number) => `/api/department/${id}`,
@@ -30,4 +39,19 @@ export const API_ENDPOINT = {
   ROLE: {
     GET_ALL: "/api/role"
   },
+  TARGET_CONDITION :{
+    GET_ALL:"/api/target-condition"
+  },
+  MONTH:{
+    GET_ALL:"/api/month-of-delivery"
+  },
+  FREQUENCY:{
+    GET_ALL:"/api/frequency"
+  },
+  KPI_SUBMISSION:{
+    UPDATE:(id:number) =>`/api/kpi/${id}/kpi-submission`
+  },
+  GET_USER_BY_DEPARTMENT:{
+    GET_USER_DEPARTMENT:(id:number)=>`/api/user/department/${id}`
+  }
 };

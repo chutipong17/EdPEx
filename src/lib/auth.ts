@@ -1,19 +1,20 @@
-
 //API
-import 'server-only'
-import { cookies } from 'next/headers'
+import "server-only";
+import { cookies } from "next/headers";
 import axios from "axios";
-import axiosInstance from "@/lib/axios"
-export const SESSION_COOKIE = 'edpex_session'
+import axiosInstance from "@/lib/axios";
+export const SESSION_COOKIE = "edpex_session";
 
 export interface SessionUser {
-  id: number
-  firstName: string
-  lastName: string
-  email: string
-  department: string
-  phone: string
-  role: 'USER' | 'ADMIN' | 'EXECUTIVE'
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  departmentName: string;
+  
+  // mobileNumber: string;
+  role: "USER" | "ADMIN" | "EXECUTIVE";
+  // roleCode: "USER" | "ADMIN" | "EXECUTIVE";
 }
 
 //   id: string
@@ -23,34 +24,39 @@ export interface SessionUser {
 //   department: string
 // }
 export async function auth(): Promise<{ user: SessionUser } | null> {
-  const store = await cookies()
-  const session = store.get(SESSION_COOKIE)?.value
+  const store = await cookies();
+  const session = store.get(SESSION_COOKIE)?.value;
+  console.log("Session Auth === ", JSON.stringify(session));
 
-  if (!session) return null
+  if (!session) return null;
 
   try {
-    const user = JSON.parse(session)
-    return { user }
+    const user = JSON.parse(session);
+    console.log("user  Auth === " + user);
+    return { user };
   } catch {
-    return null
+    return null;
   }
 }
 
 export async function verifyCredentials(
   userName: string,
-  password: string
+  password: string,
 ): Promise<SessionUser | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName,
+          password,
+        }),
       },
-      body: JSON.stringify({
-        userName,
-        password,
-      }),
-    });
+    );
 
     const result = await res.json();
 
@@ -59,25 +65,37 @@ export async function verifyCredentials(
     }
 
     const user = result.data;
-    console.log("reSULT === ",result);
-    
+    console.log("reSULT === ", { role: user.roleCode });
+
+    // const sessionUser: SessionUser = {
+    //   id: user.id,
+    //   firstName: user.firstName,
+    //   lastName: user.lastName,
+    //   email: user.email,
+    //   departmentName: user.departmentName ?? "",
+    //   mobileNumber: user.mobileNumber ?? "",
+    //   role: user.roleCode,
+    // };
+
+    // console.log("SESSION USER =", sessionUser);
 
     return {
       id: user.id,
       firstName: user.firstName,
-      lastName: `${user.firstName} ${user.lastName ?? ""}`.trim(),
+      lastName: user.lastName,
       email: user.email,
-      department: "",
-      phone: "",
+      departmentName: user.departmentName ?? "",
+      
       role:
-        user.rolePermission?.[0]?.roleId === 1
+        user.roleId=== 1
           ? "ADMIN"
-          : user.rolePermission?.[0]?.roleId === 2
-          ? "EXECUTIVE"
-          : "USER",
+          : user.roleId === 2
+          ? "USER"
+          : "EXECUTIVE",
     };
+    // return sessionUser;
   } catch (error) {
-    console.error("ERROR ",error);
+    console.error("ERROR ", error);
     return null;
   }
 }
@@ -125,8 +143,6 @@ export async function verifyCredentials(
 //     return null;
 //   }
 // }
-
-
 
 // export async function verifyCredentials(
 //   userName: string,
@@ -176,9 +192,7 @@ export async function verifyCredentials(
 
 // //   throw error;
 // // }
-    
-  
- 
+
 // }
 
 // export interface SessionUser {
@@ -192,7 +206,6 @@ export async function verifyCredentials(
 // export interface Session {
 //   user: SessionUser
 // }
-
 
 // export const DEMO_USERS: Record<string, SessionUser & { password: string }> = {
 //   USER001: {
@@ -213,9 +226,6 @@ export async function verifyCredentials(
 //   },
 // }
 
-
-
-
 // export async function auth(): Promise<{ user: SessionUser } | null> {
 //   const store = await cookies()
 //   const session = store.get(SESSION_COOKIE)?.value
@@ -229,7 +239,6 @@ export async function verifyCredentials(
 //     return null
 //   }
 // }
-
 
 // export async function verifyCredentials(
 //   username: string,

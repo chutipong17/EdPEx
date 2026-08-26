@@ -42,7 +42,7 @@ export function DepartmentManager() {
   return (
     <Card className="rounded-3xl shadow-sm">
       <CardHeader className="flex-row items-center justify-between gap-4">
-        <CardTitle className="text-lg">รายการหน่วยงาน</CardTitle>
+        {/* <CardTitle className="text-lg">รายการหน่วยงาน</CardTitle> */}
         <AddDepartmentDialog onCreated={() => mutate()} />
       </CardHeader>
       <CardContent>

@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { KeyRound, Pencil, Trash2 } from 'lucide-react'
+import { KeyRound, Pencil, Trash2 } from "lucide-react";
 
 import {
   Table,
@@ -9,25 +9,31 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
-import { Users } from 'lucide-react'
-import type { User, UserRole} from '@/types/user'
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import { Users } from "lucide-react";
+import type { User, UserRole } from "@/types/user";
 
-const roleStyles: Record<UserRole, string> = {
-  ADMIN: 'border-primary/30 bg-accent text-primary',
-  EXECUTIVE: 'border-warning/30 bg-warning/10 text-warning',
-  USER: 'border-info/30 bg-info/10 text-info',
-}
+// const roleStyles: Record<UserRole, string> = {
+//   ADMIN: 'border-primary/30 bg-accent text-primary',
+//   EXECUTIVE: 'border-warning/30 bg-warning/10 text-warning',
+//   USER: 'border-info/30 bg-info/10 text-info',
+// }
 
 interface UserTableProps {
-  users: User[]
-  startIndex: number
-  onEdit: (user: User) => void
-  onChangePassword: (user: User) => void
-  onDelete: (user: User) => void
+  users: User[];
+  startIndex: number;
+  onEdit: (user: User) => void;
+  onChangePassword: (user: User) => void;
+  onDelete: (user: User) => void;
 }
 
 export function UserTable({
@@ -37,6 +43,11 @@ export function UserTable({
   onChangePassword,
   onDelete,
 }: UserTableProps) {
+  const roleStyles: Record<UserRole, string> = {
+    ADMIN: "border-primary/30 bg-accent text-primary",
+    EXECUTIVE: "border-warning/30 bg-warning/10 text-warning",
+    USER: "border-info/30 bg-info/10 text-info",
+  };
   if (users.length === 0) {
     return (
       <Empty className="rounded-xl border border-dashed">
@@ -50,7 +61,7 @@ export function UserTable({
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
-    )
+    );
   }
 
   return (
@@ -78,13 +89,17 @@ export function UserTable({
                   <span className="font-medium">{user.username}</span>
                   <Badge
                     variant="outline"
-                    className={`px-1.5 py-0 text-[10px] ${roleStyles[user.role]}`}
+                    className={`rounded-md border px-2 py-1 text-sm ${
+                      roleStyles[user.roleCode as UserRole] ?? ""
+                    }`}
                   >
-                    {user.role}
+                    {user.roleNameTh}
                   </Badge>
                 </div>
               </TableCell>
-              <TableCell>{user.fullname}</TableCell>
+              <TableCell>
+                {user.firstName} {user.lastName}
+              </TableCell>
               <TableCell className="text-muted-foreground">
                 {user.email}
               </TableCell>
@@ -92,19 +107,18 @@ export function UserTable({
                 {user.department}
               </TableCell>
               <TableCell className="font-mono text-sm text-muted-foreground">
-                {user.phone}
+                {user.mobileNumber}
               </TableCell>
-              
+
               <TableCell>
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  
                   <Button
                     variant="outline"
                     size="sm"
                     className="border-warning/40 text-warning hover:bg-warning hover:text-warning-foreground font-light"
                     onClick={() => onEdit(user)}
                   >
-                    <Pencil data-icon="inline-start" size={16}/>
+                    <Pencil data-icon="inline-start" size={16} />
                     แก้ไข
                   </Button>
                   <Button
@@ -113,7 +127,7 @@ export function UserTable({
                     className="border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground font-light"
                     onClick={() => onDelete(user)}
                   >
-                    <Trash2 data-icon="inline-start" size={16}/>
+                    <Trash2 data-icon="inline-start" size={16} />
                     ลบ
                   </Button>
                   <Button
@@ -122,16 +136,15 @@ export function UserTable({
                     className="border-info/40 text-info hover:bg-info hover:text-info-foreground font-light"
                     onClick={() => onChangePassword(user)}
                   >
-                    <KeyRound data-icon="inline-start" size={16}/>
+                    <KeyRound data-icon="inline-start" size={16} />
                     เปลี่ยนรหัสผ่าน
                   </Button>
                 </div>
               </TableCell>
-
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

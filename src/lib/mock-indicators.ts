@@ -1,6 +1,7 @@
 import type { Indicator } from "@/types/indicator-Edpx"
 
-export const indicators: Indicator[] = [
+export const indicators: Indicator[] = 
+[
   {
     id: "ind-001",
     year: "2567",

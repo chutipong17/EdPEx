@@ -12,7 +12,7 @@ export default async function IndicatorsPage() {
   return (
 
     <DashboardLayout  user={session.user}>
-        <IndicatorList indicators={indicators} />
+        <IndicatorList  />
     </DashboardLayout>
    
   )
