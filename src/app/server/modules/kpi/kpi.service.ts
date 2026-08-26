@@ -75,7 +75,7 @@ export class KpiService {
         createdAt: now,
         updatedAt: now,
         kpiComparison: {
-          create: kpi.kpiComparison?.map((comparison) => ({
+          create: (kpi.kpiComparison ?? []).map((comparison) => ({
             seq: comparison.seq,
             name: comparison.name,
             result: comparison.result,
@@ -130,7 +130,11 @@ export class KpiService {
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Creating kpi failed";
-      customLog.error("Error creating kpi: ", { message: errorMessage });
+      customLog.error("Error creating KPI", {
+        message: errorMessage,
+        userId: kpi.userId,
+        departmentId: kpi.departmentId,
+      });
       throw new HTTPException(status, { message: errorMessage });
     }
   }
