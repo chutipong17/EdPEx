@@ -21,6 +21,7 @@ import targetConditionRouter from "./modules/target-condition/target-condition.r
 import userRouter from "./modules/user/user.route";
 import { getSession } from "./util/session";
 import dashboardRouter from "./modules/dashboard/dashboard.route";
+import masterDataRouter from "./modules/master-data/master-data.route";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -198,6 +199,7 @@ app.route("/kpi-category", kpiCategoryRouter);
 app.route("/department", departmentRouter);
 app.route("/kpi", kpiRouter);
 app.route("/dashboard", dashboardRouter);
+app.route("/master-data", masterDataRouter);
 
 // Serve OpenAPI JSON
 // app.doc("/swagger/json", {

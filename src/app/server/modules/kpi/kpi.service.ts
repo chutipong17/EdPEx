@@ -1,12 +1,14 @@
 import { customLog } from "@/app/server/util/custom-log";
 import { Kpi, KpiSubmission, Prisma } from "@prisma/client";
-import { KpiRepository } from "./kpi.repository";
 import { HTTPException } from "hono/http-exception";
-import { KpiDto } from "../../dto/kpi.dto";
 import prismaInstance from "../../config/prismaClientInstance";
-import { KpiSubmissionStatus } from "../../enum/enum";
-import { buildUpdateData, toDecimalUpdate } from "../../util/common";
 import { KpiSubmissionDto } from "../../dto/kpi-submission.dto";
+import { KpiDto } from "../../dto/kpi.dto";
+import { KpiByDepartmentResponse, KpiWithUserAndDept } from "../../dto/shared-includes";
+import { ConditionName, KpiStatus, KpiSubmissionStatus } from "../../enum/enum";
+import { buildUpdateData, toDecimalUpdate } from "../../util/common";
+import { evaluateTargetCondition } from "../../util/target-condition";
+import { KpiRepository } from "./kpi.repository";
 
 export class KpiService {
   private readonly prisma = prismaInstance;
@@ -15,7 +17,9 @@ export class KpiService {
   async getKpi(): Promise<Kpi[]> {
     try {
       customLog.info("Getting kpi service");
-      return await this.kpiRepository.getKpi();
+      const kpi = await this.kpiRepository.getKpi();
+      const data = this.calculateKpiSubmissionStatus(kpi);
+      return data;
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Getting kpi failed";
@@ -26,7 +30,10 @@ export class KpiService {
 
   async getKpiByDepartment(departmentId: number) {
     try {
-      return await this.kpiRepository.getKpiByDepartment(departmentId);
+      customLog.info("Getting kpi by department service");
+      const kpiTarget = await this.kpiRepository.getKpiByDepartment(departmentId);
+      const data = this.calculateKpiSubmissionStatusKpiByDepartment(kpiTarget);
+      return data;
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Getting kpi by department failed";
@@ -37,7 +44,13 @@ export class KpiService {
 
   async getKpiById(id: number) {
     try {
-      return await this.kpiRepository.getKpiById(id);
+      customLog.info("Getting kpi by ID service");
+      const kpiTarget = await this.kpiRepository.getKpiById(id);
+      if (!kpiTarget) {
+        return null;
+      }
+      const data = this.calculateSubmissionStatus(kpiTarget.kpi as KpiWithUserAndDept);
+      return data;
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Getting kpi by ID failed";
@@ -287,5 +300,66 @@ export class KpiService {
       customLog.error("Error updating kpi submission: ", { message: errorMessage });
       throw new HTTPException(status, { message: errorMessage });
     }
+  }
+
+  private calculateSubmissionStatus(
+    kpiItem: KpiWithUserAndDept,
+  ): KpiStatus {
+    const submissions = kpiItem.kpiAssignment
+      .flatMap((assignment) => assignment.kpiSubmission ?? [])
+      .filter(
+        (submission) =>
+          submission.status?.id !== KpiSubmissionStatus.PENDING,
+      );
+
+    if (submissions.length === 0) {
+      return KpiStatus.NODATA;
+    }
+
+    const latestSubmission = submissions.reduce((latest, current) => {
+      const latestDate = latest.submittedDate ?? latest.createdAt;
+      const currentDate = current.submittedDate ?? current.createdAt;
+
+      return new Date(currentDate).getTime() >
+        new Date(latestDate).getTime()
+        ? current
+        : latest;
+    });
+
+    const target = Number(kpiItem.targetValue ?? 0);
+    const value = Number(latestSubmission.actualValue ?? 0);
+
+    const condition =
+      ConditionName[
+        kpiItem.targetCondition.conditionName as keyof typeof ConditionName
+      ];
+
+    const achievedTarget = evaluateTargetCondition(
+      value,
+      condition,
+      target,
+    );
+
+    return achievedTarget
+      ? KpiStatus.TARGET_ACHIEVED
+      : KpiStatus.NOT_ACHIEVED;
+  }
+
+  async calculateKpiSubmissionStatus(
+    kpi: KpiWithUserAndDept[],
+  ) {
+    return kpi.map((kpiItem) => ({
+      ...kpiItem,
+      kpiSubmissionStatus: this.calculateSubmissionStatus(kpiItem),
+    }));
+  }
+
+  async calculateKpiSubmissionStatusKpiByDepartment(
+    kpiTarget: KpiByDepartmentResponse[],
+  ) {
+    return kpiTarget.map((kpiItem) => ({
+      ...kpiItem,
+      kpiSubmissionStatus: this.calculateSubmissionStatus(kpiItem.kpi as KpiWithUserAndDept),
+    }));
   }
 }
