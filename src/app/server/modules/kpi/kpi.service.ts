@@ -47,7 +47,7 @@ export class KpiService {
       customLog.info("Getting kpi by ID service");
       const kpiTarget = await this.kpiRepository.getKpiById(id);
       if (!kpiTarget) {
-        return {} as KpiByDepartmentResponse;
+        return null;
       }
       const data = this.calculateSubmissionStatus(kpiTarget.kpi as KpiWithUserAndDept);
       return data;
