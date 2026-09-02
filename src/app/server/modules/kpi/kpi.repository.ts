@@ -2,11 +2,12 @@ import prismaInstance from "@/app/server/config/prismaClientInstance";
 import { customLog } from "@/app/server/util/custom-log";
 import { Kpi, KpiSubmission, Prisma } from "@prisma/client";
 import { HTTPException } from "hono/http-exception";
+import { KpiByDepartmentResponse, KpiWithUserAndDept } from "../../dto/shared-includes";
 
 export class KpiRepository {
   private readonly prisma = prismaInstance;
 
-  async getKpi() {
+  async getKpi(): Promise<KpiWithUserAndDept[]> {
     try {
       const kpi = await this.prisma.kpi.findMany({
         where: { isDeleted: false },
@@ -71,7 +72,7 @@ export class KpiRepository {
     }
   }
 
-  async getKpiByDepartment(departmentId: number) {
+  async getKpiByDepartment(departmentId: number): Promise<KpiByDepartmentResponse[]> {
     try {
       const kpiTargets = await this.prisma.kpiTarget.findMany({
         where: {
@@ -139,7 +140,7 @@ export class KpiRepository {
     }
   }
 
-  async getKpiById(id: number) {
+  async getKpiById(id: number): Promise<KpiByDepartmentResponse | null> {
     try {
       const kpiTargets = await this.prisma.kpiTarget.findFirst({
         where: {

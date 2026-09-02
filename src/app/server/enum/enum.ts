@@ -33,3 +33,9 @@ export enum KpiDashboardStatus {
   NOT_ACHIEVED = 2, //ไม่บรรลุเป้าหมาย
   TARGET_ACHIEVED = 3, //บรรลุเป้าหมาย
 }
+
+export enum KpiStatus {
+  NODATA = "ไม่มีข้อมูล",
+  NOT_ACHIEVED = "ไม่บรรลุเป้าหมาย",
+  TARGET_ACHIEVED = "บรรลุเป้าหมาย",
+}
