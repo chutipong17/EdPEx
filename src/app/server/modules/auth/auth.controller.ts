@@ -38,6 +38,8 @@ export class AuthController {
   signUp = async (c: Context, body: SignUpDto) => {
     try {
       const userId = c.get("userId");
+      console.log("userId =", userId);
+      
       const result = await this.authService.signUp(body, Number(userId));
 
       customLog.info("Sign up result :", { result });

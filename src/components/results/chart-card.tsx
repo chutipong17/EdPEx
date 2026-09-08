@@ -98,7 +98,7 @@ export function ChartCard({ indicator, chartType }: ChartCardProps) {
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-              domain={[0, 6]}
+              domain={[0, 100]}
             />
             <Tooltip
               content={<ChartTooltip />}

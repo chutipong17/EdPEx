@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   Cell,
   Legend,
@@ -8,20 +8,23 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
-} from 'recharts'
-import type { PieDatum } from '@/types/dashboard'
+} from "recharts";
+import type { PieDatum } from "@/types/dashboard";
 
 function ChartTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const item = payload[0]
+  if (!active || !payload?.length) return null;
+  const item = payload[0];
   return (
     <div className="rounded-xl border border-border bg-card px-3 py-2 shadow-md">
       <p className="text-xs font-medium text-foreground">{item.name}</p>
-      <p className="text-sm font-semibold" style={{ color: item.payload.color }}>
+      <p
+        className="text-sm font-semibold"
+        style={{ color: item.payload.color }}
+      >
         {item.value}%
       </p>
     </div>
-  )
+  );
 }
 
 function renderLegend({ payload }: any) {
@@ -38,23 +41,23 @@ function renderLegend({ payload }: any) {
         </li>
       ))}
     </ul>
-  )
+  );
 }
 
 export function PerformancePieChart({ data }: { data: PieDatum[] }) {
-  const [radius, setRadius] = useState(110)
+  const [radius, setRadius] = useState(110);
 
   useEffect(() => {
     const compute = () => {
-      const w = window.innerWidth
-      if (w < 768) setRadius(70)
-      else if (w < 1280) setRadius(90)
-      else setRadius(110)
-    }
-    compute()
-    window.addEventListener('resize', compute)
-    return () => window.removeEventListener('resize', compute)
-  }, [])
+      const w = window.innerWidth;
+      if (w < 768) setRadius(70);
+      else if (w < 1280) setRadius(90);
+      else setRadius(110);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
 
   return (
     <div className="flex h-[320px] flex-col rounded-2xl border border-border bg-card p-6 shadow-sm">
@@ -72,9 +75,9 @@ export function PerformancePieChart({ data }: { data: PieDatum[] }) {
               cy="50%"
               outerRadius={radius}
               innerRadius={radius * 0.55}
-              paddingAngle={2}
-              stroke="var(--card)"
-              strokeWidth={2}
+              paddingAngle={0}
+              stroke="none"
+              isAnimationActive={false}
             >
               {data.map((entry) => (
                 <Cell key={entry.name} fill={entry.color} />
@@ -86,5 +89,5 @@ export function PerformancePieChart({ data }: { data: PieDatum[] }) {
         </ResponsiveContainer>
       </div>
     </div>
-  )
+  );
 }

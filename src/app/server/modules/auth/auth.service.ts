@@ -52,17 +52,17 @@ export class AuthService {
         type: argon2.argon2id,
       });
 
-      const adminUser =
-        signUpDto.role === Role.ADMIN
-          ? null
-          : await this.userRepository.getUserById(userId);
+      // const adminUser =
+      //   signUpDto.role === Role.ADMIN
+      //     ? null
+      //     : await this.userRepository.getUserById(userId);
 
-      const fullName =
-        signUpDto.role === Role.ADMIN
-          ? "system"
-          : [adminUser?.firstName, adminUser?.lastName]
-              .filter(Boolean)
-              .join(" ");
+      // const fullName =
+      //   signUpDto.role === Role.ADMIN
+      //     ? "system"
+      //     : [adminUser?.firstName, adminUser?.lastName]
+      //         .filter(Boolean)
+      //         .join(" ");
 
       const userData: Prisma.UserCreateInput = {
         email: signUpDto.email,
@@ -71,8 +71,8 @@ export class AuthService {
         mobileNumber: signUpDto.mobileNumber || undefined,
         isDeleted: false,
         isActive: true,
-        createdBy: adminUser ? fullName : "system",
-        updatedBy: adminUser ? fullName : "system",
+        createdBy: "system",
+        updatedBy: "system",
       };
 
       if (signUpDto.role !== Role.ADMIN) {
@@ -93,8 +93,8 @@ export class AuthService {
             permissionId,
             userId: createdUser.id,
             isDeleted: false,
-            createdBy: adminUser ? fullName : "system",
-            updatedBy: adminUser ? fullName : "system",
+            createdBy: "system",
+            updatedBy: "system",
           }));
         customLog.info("Role permission data", { rolePermissionData });
         await this.roleRepository.createRolePermissionTransaction(tx, rolePermissionData);
@@ -106,8 +106,8 @@ export class AuthService {
           },
           password: hashedPassword,
           isDeleted: false,
-          createdBy: adminUser ? fullName : "system",
-          updatedBy: adminUser ? fullName : "system",
+          createdBy: "system",
+          updatedBy: "system",
         };
 
         customLog.info("Auth data", { authData });

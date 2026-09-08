@@ -131,6 +131,7 @@ export function UsersPage() {
         department: Number(values.department), // Convert department to number
         role: Number(values.role), // Convert role to number
       };
+      
       const response = await createUser({
         body: payload,
       });
@@ -138,12 +139,14 @@ export function UsersPage() {
       console.log("response:", response);
 
       const result = await response.json();
+      console.log("Result ====",result);
+      
 
       if (!response.ok) {
         throw new Error(result.message || "ไม่สามารถเพิ่มผู้ใช้งานได้");
       }
 
-      toast.success("เพิ่มผู้ใช้งานสำเร็จ");
+      // toast.success("เพิ่มผู้ใช้งานสำเร็จ");
 
       setAddOpen(false);
 
