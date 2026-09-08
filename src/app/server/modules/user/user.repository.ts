@@ -25,7 +25,7 @@ export class UserRepository {
   async findUserByEmail(email: string): Promise<User> {
     try {
       return await this.prisma.user.findFirst({
-        where: { email },
+        where: { email, isDeleted: false },
       }) as User;
     } catch (error) {
       customLog.error("Error fetching user by email", { error });

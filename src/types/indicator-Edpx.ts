@@ -14,6 +14,12 @@ export type TargetCondition =
   | "เท่ากับ"
   | "อยู่ในช่วง";
 
+  interface KpiApiData {
+  id: number;
+  year: number;
+  targetValue: string | number | null;
+  kpiComparison?: KpiComparison[];
+}
 export interface Collector {
   name: string;
   result: string;

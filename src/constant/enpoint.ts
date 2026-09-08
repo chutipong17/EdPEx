@@ -1,4 +1,7 @@
 export const API_ENDPOINT = {
+  DASHBOARD: {
+    GET_ALL: "/api/dashboard/kpi-summary"
+  },
   AUTH: {
     SIGN_IN: "/api/auth/sign-in",
     SIGN_OUT: "/api/auth/sign-out",
