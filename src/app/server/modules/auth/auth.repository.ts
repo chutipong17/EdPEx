@@ -31,6 +31,7 @@ export class AuthRepository {
               email: true,
               firstName: true,
               lastName: true,
+              mobileNumber: true,
               isActive: true,
               isDeleted: true,
               createdAt: true,
