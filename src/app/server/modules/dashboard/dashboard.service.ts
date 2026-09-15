@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { ConditionName, KpiSubmissionStatus } from "../../enum/enum";
 import { evaluateTargetCondition } from "../../util/target-condition";
 import { DashboardRepository } from "./dashboard.repository";
-import { DashboardDto } from "../../dto/dashboard.dto";
+import { DashboardDto, KpiComparisonDashboardDto } from "../../dto/dashboard.dto";
 
 export interface KpiSummaryResponse {
   total: number;       // จำนวนตัวชี้วัดทั้งหมด
@@ -69,6 +69,18 @@ export class DashboardService {
       const status = error instanceof HTTPException ? error.status : 500;
       const errorMessage = error instanceof Error ? error.message : "Getting dashboard failed";
       customLog.error("Error getting dashboard: ", { message: errorMessage });
+      throw new HTTPException(status, { message: errorMessage });
+    }
+  }
+
+  async getKpiComparisonDashboard(data: KpiComparisonDashboardDto) {
+    try {
+      customLog.info("Getting KPI comparison dashboard service");
+      return await this.dashboardRepository.getKpiComparisonDashboard(data);;
+    } catch (error) {
+      const status = error instanceof HTTPException ? error.status : 500;
+      const errorMessage = error instanceof Error ? error.message : "Getting KPI comparison dashboard failed";
+      customLog.error("Error getting KPI comparison dashboard: ", { message: errorMessage });
       throw new HTTPException(status, { message: errorMessage });
     }
   }

@@ -147,7 +147,7 @@ model Kpi {
   monthOfDeliveryId Int       @map("month_of_delivery_id")
   frequencyId       Int       @map("frequency_id")
   targetConditionId Int       @map("target_condition_id")
-  kpiCode           String    @map("kpi_code")     @db.VarChar(255)
+  kpiCode           String    @map("kpi_code")     @db.NVarChar(255)
   kpiName           String    @map("kpi_name")     @db.NVarChar(255)
   description       String?   @map("description")  @db.NVarChar(Max)
   unit              String    @map("unit")         @db.NVarChar(255)
