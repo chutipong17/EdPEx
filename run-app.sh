@@ -45,8 +45,13 @@ trap cleanup EXIT INT TERM
 
 log "========== START SETUP MIGRATION =========="
 
-run_cmd "Start docker containers" docker start sqlserver
-CONTAINER_STARTED_BY_SCRIPT=true
+if docker ps --filter "name=^sqlserver$" --filter "status=running" --format '{{.Names}}' | grep -q sqlserver; then
+  log "sqlserver already running, skip start"
+  CONTAINER_STARTED_BY_SCRIPT=false
+else
+  run_cmd "Start docker containers" docker start sqlserver
+  CONTAINER_STARTED_BY_SCRIPT=true
+fi
 
 log "Waiting for SQL Server..."
 
