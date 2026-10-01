@@ -125,7 +125,7 @@ export class AuthService {
 
     } catch (error) {
       const status = error instanceof HTTPException ? error.status : 500;
-      customLog.error("Error signing up user: ", { message: `${error}` || "Sign up failed" });
+      customLog.error("Error signing up user:", { message: `${error}` || "Sign up failed" });
       throw new HTTPException(status, { message: `${error}` || "Sign up failed" });
     }
   }

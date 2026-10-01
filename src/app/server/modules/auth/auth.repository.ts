@@ -2,6 +2,7 @@ import prismaInstance from "@/app/server/config/prismaClientInstance";
 import { customLog } from "@/app/server/util/custom-log";
 import { Auth, Prisma, RefreshToken, User } from "@prisma/client";
 import { HTTPException } from "hono/http-exception";
+import { mapPrismaError } from "../../util/prisma-error";
 
 export class AuthRepository {
   private readonly prisma = prismaInstance;
@@ -62,8 +63,11 @@ export class AuthRepository {
         data: authData,
       });
     } catch (error) {
+      const mappingError = mapPrismaError(error);
       customLog.error("Error creating auth", { error });
-      throw new HTTPException(400, { message: "Failed to create auth" });
+      const status = mappingError.status || 400;
+      const message = mappingError.message.split("(")[0].trim() || "Failed to create auth";
+      throw new HTTPException(status, { message });
     }
   }
 
