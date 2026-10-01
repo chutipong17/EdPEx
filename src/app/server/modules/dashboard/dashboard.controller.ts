@@ -1,9 +1,8 @@
-import { DashboardService } from "./dashboard.service";
-import { Context } from "hono";
 import { customLog } from "@/app/server/util/custom-log";
+import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { convertErrorMessage } from "../../util/common";
 import { DashboardDto, KpiComparisonDashboardDto } from "../../dto/dashboard.dto";
+import { DashboardService } from "./dashboard.service";
 
 export class DashboardController {
   constructor(
