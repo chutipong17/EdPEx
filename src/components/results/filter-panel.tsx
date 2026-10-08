@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { CATEGORIES, YEAR_OPTIONS, CHART_TYPE_OPTIONS } from "@/lib/mock-data";
 import type { FilterState } from "@/types/indicator-graph";
-
+import { useGetKpiCategory } from "@/service/kpi-category/kpi-category";
+import { FilterOption } from "@/types/dashboard";
 interface FilterPanelProps {
   filters: FilterState;
   onChange: (next: Partial<FilterState>) => void;
@@ -29,11 +30,45 @@ export function FilterPanel({
   onSearch,
   onReset,
 }: FilterPanelProps) {
+  const {
+    data: kpiCategoryData,
+    isLoading: kpiCategoryLoading,
+    error: kpiCategoryError,
+    refetch: mutate,
+  } = useGetKpiCategory();
+
+  const categories = Array.isArray(kpiCategoryData)
+    ? kpiCategoryData
+    : (kpiCategoryData?.data ?? []);
+
+  const selectedCategoryName =
+    categories.find((item: any) => String(item.id) === String(filters.category))
+      ?.categoryName ?? "";
+
+ const currentYear = new Date().getFullYear() + 543;
+
+const yearOptions: FilterOption[] = Array.from(
+  { length: 8 },
+  (_, index) => {
+    const year = currentYear - 3 + index;
+
+    return {
+      label: year === currentYear ? "ปีปัจจุบัน" : String(year),
+      value: String(year),
+    };
+  },
+);
+  const selectedChartTypeLabel =
+    CHART_TYPE_OPTIONS.find((item) => item.value === filters.chartType)
+      ?.label ?? "เลือกรูปแบบ";
   return (
     <section
       className="rounded-3xl bg-card p-6 shadow-sm"
       aria-label="ตัวกรองข้อมูล"
     >
+      <h4 className="mb-6 text-2xl font-semibold text-balance text-title bt-2">
+        รายละเอียดตัวชี้วัดรายตัว
+      </h4>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {/* ปี */}
         <div className="flex flex-col gap-1.5">
@@ -50,11 +85,11 @@ export function FilterPanel({
             <SelectTrigger id="filter-year" className="h-10 w-full">
               <SelectValue placeholder="เลือกปี" />
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value={ALL}>ทุกปี</SelectItem>
-              {YEAR_OPTIONS.map((o) => (
-                <SelectItem key={o.value} value={o.value}>
-                  {o.label}
+              {yearOptions.map((year) => (
+                <SelectItem key={year.value} value={year.value}>
+                  {year.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -74,13 +109,19 @@ export function FilterPanel({
             onValueChange={(v) => onChange({ category: v })}
           >
             <SelectTrigger id="filter-category" className="h-10 w-full">
-              <SelectValue placeholder="เลือกประเภท" />
+              <SelectValue>
+                {filters.category === ALL
+                  ? "ทุกประเภท"
+                  : selectedCategoryName || "เลือกประเภท"}
+              </SelectValue>
             </SelectTrigger>
+
             <SelectContent>
               <SelectItem value={ALL}>ทุกประเภท</SelectItem>
-              {CATEGORIES.map((o) => (
-                <SelectItem key={o.value} value={o.value}>
-                  {o.label}
+
+              {categories.map((item: any) => (
+                <SelectItem key={item.id} value={String(item.id)}>
+                  {item.categoryName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -100,8 +141,9 @@ export function FilterPanel({
             onValueChange={(v) => onChange({ chartType: v })}
           >
             <SelectTrigger id="filter-chart" className="h-10 w-full">
-              <SelectValue placeholder="เลือกรูปแบบ" />
+              <SelectValue>{selectedChartTypeLabel}</SelectValue>
             </SelectTrigger>
+
             <SelectContent>
               {CHART_TYPE_OPTIONS.map((o) => (
                 <SelectItem key={o.value} value={o.value}>
@@ -113,7 +155,7 @@ export function FilterPanel({
         </div>
 
         {/* ค้นหาตัวชี้วัด */}
-        <div className="flex flex-col gap-1.5">
+        {/* <div className="flex flex-col gap-1.5">
           <Label
             htmlFor="filter-search"
             className="text-sm text-muted-foreground"
@@ -130,7 +172,7 @@ export function FilterPanel({
             placeholder="พิมพ์รหัสหรือชื่อตัวชี้วัด"
             className="h-10"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">

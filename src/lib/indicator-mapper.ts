@@ -362,5 +362,44 @@ export function indicatorToFormValues(
   };
 }
 
+import type {
+  Indicator,
+  KpiAssignment,
+} from "@/types/dashboard";
 
+// ...
+
+export function mapKpiToIndicator(kpi: any): Indicator {
+  return {
+    id: String(kpi.id ?? ""),
+    year: String(kpi.year ?? ""),
+    code: kpi.kpiCode ?? "",
+    name: kpi.kpiName ?? "",
+
+    department: kpi.departmentName ?? "-",
+
+    owner:
+      `${kpi.firstName ?? ""} ${kpi.lastName ?? ""}`.trim() || "-",
+
+    dataType:
+      kpi.frequency?.frequencyName ?? "-",
+
+    target: Number(kpi.targetValue ?? 0),
+
+    unit: kpi.unit ?? "",
+
+    result: null,
+
+    status: "warning",
+
+    kpiSubmissionStatus:
+      kpi.kpiSubmissionStatus ?? null,
+
+    // สำคัญมาก
+    kpiAssignment:
+      Array.isArray(kpi.kpiAssignment)
+        ? kpi.kpiAssignment
+        : [],
+  };
+}
 

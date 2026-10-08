@@ -50,7 +50,7 @@ import {
   deleteUser,
   changePassword,
 } from "@/components/serveices/authService";
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 15;
 
 
 
@@ -96,6 +96,7 @@ export function UsersPage() {
   useEffect(() => {
     setUsers(AllUsers?.data ?? []);
   }, [AllUsers]);
+  
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return users;

@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 export const DashboardDto = z.object({
-  year: z.number().int().nullish().transform((value) => value ?? new Date().getFullYear()),
+  year: z.number().int().nullish().transform((value) => value ?? new Date().getFullYear() + 543),
   kpiCategoryId: z.number().int().nullish().transform((value) => value ?? null),
   departmentId: z.number().int().nullish().transform((value) => value ?? null)
 });
 
 export const KpiComparisonDashboardDto = z.object({
-  year: z.number().int().nullish().transform((value) => value ?? new Date().getFullYear()),
+  year: z.number().int().nullish().transform((value) => value ?? new Date().getFullYear() + 543),
   kpiCategoryId: z.number().int().nullish().transform((value) => value ?? null),
   kpiCode: z.string().nullable().optional().transform((v) => v ?? null),
 });

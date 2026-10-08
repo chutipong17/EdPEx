@@ -246,6 +246,40 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+function getActualValue(
+  indicator: Indicator,
+): string {
+  const submissions =
+    indicator.kpiAssignment
+      ?.flatMap(
+        (assignment) =>
+          assignment.kpiSubmission ?? [],
+      )
+      .filter(
+        (submission) =>
+          !submission.isDeleted,
+      ) ?? [];
+
+  if (submissions.length === 0) {
+    return "-";
+  }
+
+  const latestSubmission =
+    [...submissions].sort(
+      (a, b) =>
+        new Date(
+          b.updatedAt,
+        ).getTime() -
+        new Date(
+          a.updatedAt,
+        ).getTime(),
+    )[0];
+
+  return (
+    latestSubmission.actualValue ??
+    "-"
+  );
+}
 /* =====================================================
    Status
 ===================================================== */
@@ -454,7 +488,7 @@ export function IndicatorTable({ data }: { data: Indicator[] }) {
                   <TableCell className="text-sm">{row.unit}</TableCell>
 
                   <TableCell className="text-sm tabular-nums">
-                    {row.result ?? "-"}
+                    {getActualValue(row)}
                   </TableCell>
 
                   <TableCell>

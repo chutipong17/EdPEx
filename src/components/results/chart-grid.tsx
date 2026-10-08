@@ -1,12 +1,15 @@
-import { ChartCard } from "@/components/results/chart-card"
-import type { IndicatorGraph } from "@/types/indicator-graph"
+import { ChartCard } from "@/components/results/chart-card";
+import type { IndicatorGraph } from "@/types/indicator-graph";
 
 interface ChartGridProps {
-  indicators:IndicatorGraph []
-  chartType: string
+  indicators: IndicatorGraph[];
+  chartType: string;
 }
 
-export function ChartGrid({ indicators, chartType }: ChartGridProps) {
+export function ChartGrid({
+  indicators,
+  chartType,
+}: ChartGridProps) {
   if (indicators.length === 0) {
     return (
       <div className="flex min-h-[300px] items-center justify-center rounded-xl border border-dashed border-border">
@@ -14,7 +17,7 @@ export function ChartGrid({ indicators, chartType }: ChartGridProps) {
           ไม่พบตัวชี้วัดที่ตรงกับเงื่อนไขการค้นหา
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -27,5 +30,5 @@ export function ChartGrid({ indicators, chartType }: ChartGridProps) {
         />
       ))}
     </div>
-  )
+  );
 }
