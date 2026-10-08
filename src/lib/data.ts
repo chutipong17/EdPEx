@@ -1,79 +1,237 @@
 import 'server-only'
-import { MOCK_INDICATORS } from './mock-indicators-user'
+
 import type { Indicator } from '@/types/indicators'
-import type { CreateResultInput, ResultRecord } from '@/types/result'
+import type {
+  CreateResultInput,
+  ResultRecord,
+} from '@/types/result'
 
-/**
- * In-memory result store. Replaced by a real database table in production.
- * Module-scoped so it survives across requests during the dev session.
- */
-const resultStore: ResultRecord[] = []
-let nextResultId = 1
+const API_URL = process.env.API_URL
 
-/**
- * Row Level Security boundary:
- * Returns ONLY the indicators owned by `userId`. Equivalent to
- *   SELECT * FROM indicators WHERE assignedUserId = :userId
- */
-export function getIndicatorsForUser(userId: number): Indicator[] {
-  return MOCK_INDICATORS.filter( (i) => i.assignedUserId === String(userId))
+if (!API_URL) {
+  throw new Error('API_URL is not configured')
 }
 
 /**
- * Returns a single indicator only if it belongs to `userId`.
- * Returns null when the record does not exist OR is owned by someone else,
- * so callers cannot distinguish "not found" from "not yours".
+ * Helper สำหรับตรวจสอบ response จาก API
  */
-export function getIndicatorForUser(
-  id: number,
-  userId: string,
-): Indicator | null {
-  const indicator = MOCK_INDICATORS.find((i) => i.id === id)
-  if (!indicator || indicator.assignedUserId !== userId) return null
-  return indicator
+async function parseApiResponse(response: Response) {
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ??
+        data?.error ??
+        `API request failed with status ${response.status}`,
+    )
+  }
+
+  return data
 }
 
-/** True when `userId` owns the indicator. */
-export function userOwnsIndicator(id: number, userId: string): boolean {
-  return MOCK_INDICATORS.some(
-    (i) => i.id === id && i.assignedUserId === userId,
+/**
+ * =========================================================
+ * GET INDICATORS FOR USER
+ * =========================================================
+ *
+ * Returns ONLY indicators owned by userId.
+ *
+ * API:
+ * GET /api/indicators/user/{userId}
+ */
+export async function getIndicatorsForUser(
+  userId: number,
+): Promise<Indicator[]> {
+  const response = await fetch(
+    `${API_URL}/api/indicators/user/${userId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    },
   )
+
+  const data = await parseApiResponse(response)
+
+  return data?.data ?? data ?? []
 }
 
 /**
- * Persist a result. The caller MUST have already verified ownership.
- * `userId` is forced to the session user — never trusted from the client.
+ * =========================================================
+ * GET SINGLE INDICATOR FOR USER
+ * =========================================================
+ *
+ * Returns an indicator only when it belongs to userId.
+ *
+ * API:
+ * GET /api/indicators/{id}
  */
-export function createResult(
-  input: CreateResultInput,
-  userId: string,
-): ResultRecord {
-  const record: ResultRecord = {
-    id: nextResultId++,
-    indicatorId: input.indicatorId,
-    userId,
-    resultValue: input.resultValue,
-    description: input.description,
-    submittedAt: new Date().toISOString(),
-    status: 'submitted',
-  }
-  resultStore.push(record)
+export async function getIndicatorForUser(
+  id: number,
+  userId: number,
+): Promise<Indicator | null> {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/indicators/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      },
+    )
 
-  // Reflect the submission back onto the mock indicator for the demo UI.
-  const indicator = MOCK_INDICATORS.find((i) => i.id === input.indicatorId)
-  if (indicator) {
-    indicator.resultValue = input.resultValue
-    indicator.status = 'completed'
-  }
+    if (response.status === 404) {
+      return null
+    }
 
-  return record
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json().catch(() => null)
+
+    const indicator: Indicator | null =
+      data?.data ?? data ?? null
+
+    if (!indicator) {
+      return null
+    }
+
+    if (
+      String(indicator.assignedUserId) !==
+      String(userId)
+    ) {
+      return null
+    }
+
+    return indicator
+  } catch (error) {
+    console.error(
+      'getIndicatorForUser error:',
+      error,
+    )
+
+    return null
+  }
 }
 
-export function getResultsForIndicator(
+export async function userOwnsIndicator(
+  id: number,
+  userId: number,
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/indicators/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      },
+    )
+
+    if (response.status === 404) {
+      return false
+    }
+
+    if (!response.ok) {
+      return false
+    }
+
+    const data = await response.json().catch(() => null)
+
+    const indicator: Indicator | null =
+      data?.data ?? data ?? null
+
+    if (!indicator) {
+      return false
+    }
+
+    return (
+      String(indicator.assignedUserId) ===
+      String(userId)
+    )
+  } catch (error) {
+    console.error(
+      'userOwnsIndicator error:',
+      error,
+    )
+
+    return false
+  }
+}
+
+/**
+ * =========================================================
+ * CREATE RESULT
+ * =========================================================
+ *
+ * Creates a result through Backend API.
+ *
+ * userId is always taken from the authenticated session.
+ *
+ * API:
+ * POST /api/results
+ */
+export async function createResult(
+  input: CreateResultInput,
+  userId: number,
+): Promise<ResultRecord> {
+  const response = await fetch(
+    `${API_URL}/api/results`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        indicatorId: input.indicatorId,
+        userId,
+        resultValue: input.resultValue,
+        description: input.description,
+      }),
+      cache: 'no-store',
+    },
+  )
+
+  const data = await parseApiResponse(response)
+
+  return data?.data ?? data
+}
+
+/**
+ * =========================================================
+ * GET RESULTS FOR INDICATOR
+ * =========================================================
+ *
+ * Returns only results belonging to the authenticated user.
+ *
+ * API:
+ * GET /api/results/indicator/{indicatorId}?userId={userId}
+ */
+export async function getResultsForIndicator(
   indicatorId: number,
   userId: string,
-): ResultRecord[] {
-  return resultStore.filter(
-    (r) => r.indicatorId === indicatorId && r.userId === userId,
+): Promise<ResultRecord[]> {
+  const response = await fetch(
+    `${API_URL}/api/results/indicator/${indicatorId}?userId=${encodeURIComponent(
+      userId,
+    )}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    },
   )
+
+  const data = await parseApiResponse(response)
+
+  return data?.data ?? data ?? []
 }

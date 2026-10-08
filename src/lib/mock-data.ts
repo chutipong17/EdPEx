@@ -80,8 +80,8 @@ const owners = [
   'ดร.ธนพล วงศ์เจริญ',
 ]
 
-const dataTypes = ['ร้อยละ', 'จำนวน', 'ระดับ', 'คะแนน']
-const units = ['ร้อยละ', 'คน', 'ระดับ', 'ผลงาน', 'คะแนน']
+const dataTypes = ['ร้อยละ', 'จำนวน', '\u0e23\u0e30\u0e14\u0e31\u0e1a', 'คะแนน']
+const units = ['ร้อยละ', 'คน', '\u0e23\u0e30\u0e14\u0e31\u0e1a', 'ผลงาน', 'คะแนน']
 const indicatorNames = [
   'ความพึงพอใจของผู้เรียนต่อคุณภาพการสอน',
   'อัตราการมีงานทำของบัณฑิต',
@@ -95,9 +95,17 @@ const indicatorNames = [
   'จำนวนความร่วมมือกับองค์กรภายนอก',
 ]
 
-function statusFromValues(result: number | null, target: number): IndicatorStatus {
-  if (result === null) return 'no-data'
-  return result >= target ? 'pass' : 'fail'
+function statusFromValues(
+  result: number | null,
+  target: number,
+): IndicatorStatus {
+  if (result === null) {
+    return "Pending";
+  }
+
+  return result >= target
+    ? "Submitted"
+    : "warning";
 }
 
 function seeded(i: number): number {

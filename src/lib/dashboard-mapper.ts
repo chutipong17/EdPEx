@@ -4,6 +4,8 @@ import type {
   AnalysisDatum,
   PieDatum,
   FilterOption,
+  KpiAssignment,
+  KpiSubmission,
 } from "@/types/dashboard";
 
 /* =====================================================
@@ -38,7 +40,26 @@ export interface KpiApi {
 
   remark?: string | null;
 
+  /* =====================================================
+     Submission Status
+  ===================================================== */
+
   kpiSubmissionStatus?: string | null;
+
+  /* =====================================================
+     KPI Submission
+  ===================================================== */
+
+  kpiSubmission?: {
+    id?: number;
+    kpiId?: number;
+    actualValue?: string | number | null;
+    isDeleted?: boolean;
+  } | null;
+
+  /* =====================================================
+     KPI Category
+  ===================================================== */
 
   kpiCategory?: {
     id?: number;
@@ -46,11 +67,19 @@ export interface KpiApi {
     isDeleted?: boolean;
   } | null;
 
+  /* =====================================================
+     Frequency
+  ===================================================== */
+
   frequency?: {
     id?: number;
     frequencyName?: string;
     isDeleted?: boolean;
   } | null;
+
+  /* =====================================================
+     Month
+  ===================================================== */
 
   monthOfDelivery?: {
     id?: number;
@@ -58,15 +87,31 @@ export interface KpiApi {
     value?: string;
   } | null;
 
+  /* =====================================================
+     Target Condition
+  ===================================================== */
+
   targetCondition?: {
     id?: number;
     conditionName?: string;
     description?: string;
   } | null;
 
+  /* =====================================================
+     KPI Comparison
+  ===================================================== */
+
   kpiComparison?: KpiComparison[];
 
-  kpiAssignment?: any[];
+  /* =====================================================
+     KPI Assignment
+  ===================================================== */
+
+  kpiAssignment?: KpiAssignment[];
+
+  /* =====================================================
+     KPI Target
+  ===================================================== */
 
   kpiTarget?: any[];
 }
@@ -137,6 +182,7 @@ function mapKpiStatus(
 
   return "Pending";
 }
+
 /* =====================================================
    Get KPI Result
 ===================================================== */
@@ -170,11 +216,6 @@ export function getKpiResult(
   ) {
     return null;
   }
-
-  /*
-   * ใช้ Comparison ตัวสุดท้าย
-   * เป็นผลประเมินล่าสุด
-   */
 
   const latest =
     comparisons[
@@ -231,6 +272,92 @@ export function getKpiDataType(
 }
 
 /* =====================================================
+   KPI Assignment
+===================================================== */
+
+/**
+ * แปลง kpiAssignment จาก API
+ *
+ * จุดสำคัญ:
+ *
+ * API
+ *   kpiAssignment[]
+ *      └── kpiSubmission[]
+ *
+ * จะถูกส่งต่อไปยัง Indicator โดยไม่ตัดข้อมูลออก
+ */
+function getKpiAssignments(
+  kpi: KpiApi,
+): KpiAssignment[] {
+  if (
+    !Array.isArray(
+      kpi?.kpiAssignment,
+    )
+  ) {
+    return [];
+  }
+
+  return kpi.kpiAssignment;
+}
+
+/* =====================================================
+   KPI Actual Value
+===================================================== */
+
+/**
+ * ดึง actualValue จาก KPI Assignment
+ *
+ * kpiAssignment[]
+ *      ↓
+ * kpiSubmission[]
+ *      ↓
+ * actualValue
+ */
+export function getKpiActualValue(
+  kpi: KpiApi,
+): string | null {
+  const assignments =
+    getKpiAssignments(kpi);
+
+  const submissions =
+    assignments.flatMap(
+      (assignment) =>
+        assignment.kpiSubmission ?? [],
+    );
+
+  const validSubmissions =
+    submissions.filter(
+      (submission) =>
+        !submission.isDeleted,
+    );
+
+  if (
+    validSubmissions.length === 0
+  ) {
+    return null;
+  }
+
+  /*
+   * เอาข้อมูลล่าสุด
+   */
+  const latest =
+    [...validSubmissions].sort(
+      (a, b) =>
+        new Date(
+          b.updatedAt,
+        ).getTime() -
+        new Date(
+          a.updatedAt,
+        ).getTime(),
+    )[0];
+
+  return (
+    latest?.actualValue ??
+    null
+  );
+}
+
+/* =====================================================
    KPI → Indicator
 ===================================================== */
 
@@ -241,7 +368,25 @@ export function mapKpiToDashboardIndicator(
     getKpiResult(kpi);
 
   const target =
-    toNumber(kpi?.targetValue);
+    toNumber(
+      kpi?.targetValue,
+    );
+
+  /*
+   * สำคัญ
+   *
+   * เก็บ kpiAssignment เอาไว้
+   * เพื่อให้ IndicatorTable
+   * สามารถเข้าถึง
+   *
+   * row.kpiAssignment
+   *      ↓
+   * kpiSubmission
+   *      ↓
+   * actualValue
+   */
+  const kpiAssignment =
+    getKpiAssignments(kpi);
 
   return {
     id: String(
@@ -285,16 +430,27 @@ export function mapKpiToDashboardIndicator(
 
     result,
 
-    // ใช้ค่าจาก API โดยตรง
-    kpiSubmissionStatus:
-      kpi?.kpiSubmissionStatus ?? null,
+    /* =================================================
+       Status
+    ================================================= */
 
-    // เก็บ status เดิมไว้สำหรับส่วนอื่นของระบบ
-    status: mapKpiStatus(
-      kpi?.kpiSubmissionStatus,
-    ),
+    kpiSubmissionStatus:
+      kpi?.kpiSubmissionStatus ??
+      null,
+
+    status:
+      mapKpiStatus(
+        kpi?.kpiSubmissionStatus,
+      ),
+
+    /* =================================================
+       KPI Assignment
+    ================================================= */
+
+    kpiAssignment,
   };
 }
+
 /* =====================================================
    KPI[] → Indicator[]
 ===================================================== */
@@ -314,6 +470,7 @@ export function mapKpisToDashboardIndicators(
 /* =====================================================
    KPI Summary
 ===================================================== */
+
 export interface KpiSummary {
   total: number;
   achieved: number;
@@ -324,22 +481,32 @@ export interface KpiSummary {
 export function getKpiSummary(
   indicators: Indicator[],
 ): KpiSummary {
-  const total = indicators.length;
+  const total =
+    indicators.length;
 
-  const achieved = indicators.filter(
-    (item) => item.status === "Submitted",
-  ).length;
+  const achieved =
+    indicators.filter(
+      (item) =>
+        item.status ===
+        "Submitted",
+    ).length;
 
-  const notAchieved = indicators.filter(
-    (item) => item.status === "warning",
-  ).length;
+  const notAchieved =
+    indicators.filter(
+      (item) =>
+        item.status ===
+        "warning",
+    ).length;
 
-  const noData = indicators.filter(
-    (item) =>
-      item.status === "Pending" ||
-      item.result === null ||
-      item.result === undefined,
-  ).length;
+  const noData =
+    indicators.filter(
+      (item) =>
+        item.status ===
+          "Pending" ||
+        item.result === null ||
+        item.result ===
+          undefined,
+    ).length;
 
   return {
     total,
@@ -348,6 +515,7 @@ export function getKpiSummary(
     noData,
   };
 }
+
 /* =====================================================
    Pie Data
 ===================================================== */
@@ -381,19 +549,22 @@ export function getPieData(
   const pending =
     indicators.filter(
       (item) =>
-        item.status === "Pending",
+        item.status ===
+        "Pending",
     ).length;
 
   const submitted =
     indicators.filter(
       (item) =>
-        item.status === "Submitted",
+        item.status ===
+        "Submitted",
     ).length;
 
   const warning =
     indicators.filter(
       (item) =>
-        item.status === "warning",
+        item.status ===
+        "warning",
     ).length;
 
   return [
@@ -434,10 +605,6 @@ export function mapKpisToAnalysisData(
     return [];
   }
 
-  /*
-   * Group KPI ตามปี
-   */
-
   const grouped =
     new Map<
       string,
@@ -465,10 +632,6 @@ export function mapKpisToAnalysisData(
     );
   }
 
-  /*
-   * สร้างข้อมูลแต่ละปี
-   */
-
   return Array.from(
     grouped.entries(),
   )
@@ -479,40 +642,20 @@ export function mapKpisToAnalysisData(
     )
     .map(
       ([year, yearKpis]) => {
-
-        /*
-         * AnalysisDatum
-         *
-         * เริ่มด้วย year + target
-         */
-
         const row: AnalysisDatum = {
           year,
           target: 0,
         };
 
-        /*
-         * วน KPI ในปีนั้น
-         */
-
         for (
           const kpi of yearKpis
         ) {
-
-          /*
-           * Target
-           */
-
           const target =
             toNumber(
               kpi?.targetValue,
             ) ?? 0;
 
           row.target += target;
-
-          /*
-           * Comparison
-           */
 
           const comparisons =
             Array.isArray(
@@ -537,18 +680,9 @@ export function mapKpisToAnalysisData(
                   )
               : [];
 
-          /*
-           * Dynamic
-           *
-           * ไม่กำหนด q1 / q2
-           *
-           * ใช้ name จาก API
-           */
-
           for (
             const comparison of comparisons
           ) {
-
             const name =
               String(
                 comparison?.name ?? "",
@@ -563,14 +697,11 @@ export function mapKpisToAnalysisData(
                 comparison?.result,
               );
 
-            if (result === null) {
+            if (
+              result === null
+            ) {
               continue;
             }
-
-            /*
-             * ถ้าชื่อเดียวกันหลาย KPI
-             * ให้รวมค่ากัน
-             */
 
             const currentValue =
               row[name];

@@ -1,9 +1,11 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useRouter,usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { logout } from "@/app/actions/auth";
+
 import {
   LayoutDashboard,
   BarChart3,
@@ -15,10 +17,12 @@ import {
   ChartPie,
   FilePen,
   Building2,
+  Menu,
+  X,
 } from "lucide-react";
+
 import { UserRole } from "@/types/user";
-import { auth } from "@/lib/auth";
-import router from "next/router";
+
 const isMenuActive = (pathname: string, item: NavItem) => {
   // Dashboard (/)
   if (item.href === "/" && pathname === "/") {
@@ -35,12 +39,14 @@ const isMenuActive = (pathname: string, item: NavItem) => {
     return item.children.some(
       (child) =>
         child.href &&
-        (pathname === child.href || pathname.startsWith(`${child.href}/`)),
+        (pathname === child.href ||
+          pathname.startsWith(`${child.href}/`)),
     );
   }
 
   return false;
 };
+
 export interface NavItem {
   label: string;
   icon: any;
@@ -113,7 +119,11 @@ interface SidebarProps {
   role?: UserRole;
 }
 
-export function SidebarLogo({ collapsed }: { collapsed?: boolean }) {
+export function SidebarLogo({
+  collapsed,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -130,6 +140,7 @@ export function SidebarLogo({ collapsed }: { collapsed?: boolean }) {
           <span className="text-lg font-bold text-sidebar-foreground">
             EdPEx
           </span>
+
           <span className="text-[11px] text-muted-foreground">
             Excellence System
           </span>
@@ -138,7 +149,12 @@ export function SidebarLogo({ collapsed }: { collapsed?: boolean }) {
     </div>
   );
 }
-export function SidebarFooter({ collapsed }: { collapsed?: boolean }) {
+
+export function SidebarFooter({
+  collapsed,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <div className="p-3">
       <form action={logout}>
@@ -149,100 +165,72 @@ export function SidebarFooter({ collapsed }: { collapsed?: boolean }) {
           )}
         >
           <LogOut className="size-4 shrink-0" />
-          {!collapsed && <span>ออกจากระบบ</span>}
+
+          {!collapsed && (
+            <span>ออกจากระบบ</span>
+          )}
         </button>
       </form>
-      {/* <button
-        type="button"
-        className={cn(
-          "flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90",
-        )}
-        onClick={logout()}
-      >
-        <LogOut className="size-4 shrink-0" />
-        {!collapsed && <span>ออกจากระบบ</span>}
-      </button> */}
     </div>
   );
 }
 
-export function SidebarNav({ collapsed, onNavigate, role }: SidebarProps) {
+export function SidebarNav({
+  collapsed,
+  onNavigate,
+  role,
+}: SidebarProps) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
-  const router = useRouter()
-  // console.log("pathname == ",role);
+  const router = useRouter();
 
-const filteredNavItems = navItems.filter((item) => {
-if (role === 'ADMIN') return true
-    // role check
+  const filteredNavItems = navItems.filter((item) => {
+    if (role === "ADMIN") return true;
+
     const matchRole =
       !item.roles?.length ||
-      (role && item.roles.includes(role))
+      (role && item.roles.includes(role));
 
-    // href check (optional)
     const matchHref =
       !item.href ||
-      pathname.startsWith(item.href)
+      pathname.startsWith(item.href);
 
-    return matchRole && matchHref
-  })
-//   const filteredNavItems = navItems.filter((item) => {
-//   // ADMIN เห็นทุกเมนู
-//   if (role === 'ADMIN') return true
+    return matchRole && matchHref;
+  });
 
-//   const matchRole =
-//     !item.roles?.length ||
-//     (role && item.roles.includes(role))
-
-//   return matchRole
-// })
   useEffect(() => {
-  const parentKeys = navItems
-    .filter((item) =>
-      item.children?.some(
-        (child) =>
-          child.href &&
-          (pathname === child.href ||
-            pathname.startsWith(`${child.href}/`)),
-      ),
-    )
-    .map((item) => item.key);
+    const parentKeys = navItems
+      .filter((item) =>
+        item.children?.some(
+          (child) =>
+            child.href &&
+            (pathname === child.href ||
+              pathname.startsWith(`${child.href}/`)),
+        ),
+      )
+      .map((item) => item.key);
 
-  setOpenMenus(parentKeys);
-}, [pathname, navItems]);
+    setOpenMenus(parentKeys);
+  }, [pathname]);
 
+  useEffect(() => {
+    if (role === "USER" && pathname === "/") {
+      router.replace("/my-indicators");
+    }
 
-
-useEffect(() => {
-  if (role === "USER" && pathname === "/") {
-    router.replace("/my-indicators");
-  }
- 
-  if (role === "EXECUTIVE" && pathname !== "/") {
-    router.replace("/");
-  }
-  
-}, [pathname, role]);
-
-
-  // useEffect(() => {
-  //   const parentKeys = navItems
-  //     .filter((item) =>
-  //       item.children?.some(
-  //         (child) =>
-  //           child.href &&
-  //           (pathname === child.href || pathname.startsWith(`${child.href}/`)),
-  //       ),
-  //     )
-  //     .map((item) => item.key);
-
-  //   setOpenMenus((prev) => [...new Set([...prev, ...parentKeys])]);
-  // }, [pathname]);
-
+    if (
+      role === "EXECUTIVE" &&
+      pathname !== "/"
+    ) {
+      router.replace("/");
+    }
+  }, [pathname, role, router]);
 
   const toggleMenu = (key: string) => {
     setOpenMenus((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+      prev.includes(key)
+        ? prev.filter((k) => k !== key)
+        : [...prev, key],
     );
   };
 
@@ -254,7 +242,9 @@ useEffect(() => {
 
         const buttonClass = cn(
           "flex h-12 items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
-          collapsed ? "w-12 justify-center" : "w-full px-3",
+          collapsed
+            ? "w-12 justify-center"
+            : "w-full px-3",
           active
             ? "bg-accent text-primary"
             : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -269,10 +259,15 @@ useEffect(() => {
           // ---------- COLLAPSED ----------
           if (collapsed) {
             return (
-              <div key={item.key} className="flex flex-col items-center gap-1">
+              <div
+                key={item.key}
+                className="flex flex-col items-center gap-1"
+              >
                 <button
                   type="button"
-                  onClick={() => toggleMenu(item.key)}
+                  onClick={() =>
+                    toggleMenu(item.key)
+                  }
                   className={buttonClass}
                   title={item.label}
                 >
@@ -283,18 +278,21 @@ useEffect(() => {
                   <div className="flex flex-col items-center gap-1">
                     {item.children.map((sub) => {
                       const SubIcon = sub.icon;
+
                       const subActive =
                         sub.href &&
                         (pathname === sub.href ||
-                          pathname.startsWith(`${sub.href}/`));
+                          pathname.startsWith(
+                            `${sub.href}/`,
+                          ));
 
                       return (
                         <Link
                           key={sub.key}
                           href={sub.href || "#"}
-                          onClick={() => {
-                            onNavigate?.(sub.key);
-                          }}
+                          onClick={() =>
+                            onNavigate?.(sub.key)
+                          }
                           title={sub.label}
                           className={cn(
                             "flex size-10 items-center justify-center rounded-lg transition-colors",
@@ -318,11 +316,17 @@ useEffect(() => {
             <div key={item.key}>
               <button
                 type="button"
-                onClick={() => toggleMenu(item.key)}
-                className={cn(buttonClass, "justify-between")}
+                onClick={() =>
+                  toggleMenu(item.key)
+                }
+                className={cn(
+                  buttonClass,
+                  "justify-between",
+                )}
               >
                 <div className="flex items-center gap-3">
                   <Icon className="size-5 shrink-0" />
+
                   <span>{item.label}</span>
                 </div>
 
@@ -338,16 +342,21 @@ useEffect(() => {
                 <div className="ml-6 mt-1 flex flex-col gap-1 border-l border-border pl-3">
                   {item.children.map((sub) => {
                     const SubIcon = sub.icon;
+
                     const subActive =
                       sub.href &&
                       (pathname === sub.href ||
-                        pathname.startsWith(`${sub.href}/`));
+                        pathname.startsWith(
+                          `${sub.href}/`,
+                        ));
 
                     return (
                       <Link
                         key={sub.key}
                         href={sub.href || "#"}
-                        onClick={() => onNavigate?.(sub.key)}
+                        onClick={() =>
+                          onNavigate?.(sub.key)
+                        }
                         className={cn(
                           "flex h-10 items-center gap-2 rounded-lg px-3 text-sm transition-colors",
                           subActive
@@ -356,7 +365,10 @@ useEffect(() => {
                         )}
                       >
                         <SubIcon className="size-4" />
-                        <span>{sub.label}</span>
+
+                        <span>
+                          {sub.label}
+                        </span>
                       </Link>
                     );
                   })}
@@ -374,7 +386,9 @@ useEffect(() => {
             <Link
               key={item.key}
               href={item.href || "#"}
-              onClick={() => onNavigate?.(item.key)}
+              onClick={() =>
+                onNavigate?.(item.key)
+              }
               title={item.label}
               className={buttonClass}
             >
@@ -390,11 +404,16 @@ useEffect(() => {
           <Link
             key={item.key}
             href={item.href || "#"}
-            onClick={() => onNavigate?.(item.key)}
+            onClick={() =>
+              onNavigate?.(item.key)
+            }
             className={buttonClass}
           >
             <Icon className="size-5 shrink-0" />
-            <span className="truncate">{item.label}</span>
+
+            <span className="truncate">
+              {item.label}
+            </span>
           </Link>
         );
       })}
@@ -402,38 +421,133 @@ useEffect(() => {
   );
 }
 
-export function Sidebar({ collapsed, activeKey, onNavigate,role }: SidebarProps) {
- 
-  
-  
-  
+export function Sidebar({
+  collapsed,
+  activeKey,
+  onNavigate,
+  role,
+}: SidebarProps) {
+  const [mobileOpen, setMobileOpen] =
+    useState(false);
+
+  const pathname = usePathname();
+
+  // ปิด Mobile menu เมื่อเปลี่ยนหน้า
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
   return (
-    <aside
-      className={cn(
-        "fixed inset-y-0 left-0 z-40 hidden flex-col border-sidebar-border bg-sidebar shadow lg:flex",
-        collapsed ? "w-20" : "w-[260px]",
+    <>
+      {/* =========================================
+          DESKTOP SIDEBAR
+      ========================================= */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden flex-col border-sidebar-border bg-sidebar shadow lg:flex",
+          collapsed
+            ? "w-20"
+            : "w-[260px]",
+        )}
+      >
+        <SidebarLogo
+          collapsed={collapsed}
+        />
+
+        <SidebarNav
+          role={role}
+          collapsed={collapsed}
+          activeKey={activeKey}
+          onNavigate={onNavigate}
+        />
+
+        <SidebarFooter
+          collapsed={collapsed}
+        />
+      </aside>
+
+      {/* =========================================
+          MOBILE MENU BUTTON
+      ========================================= */}
+      <button
+        type="button"
+        onClick={() =>
+          setMobileOpen(true)
+        }
+        className="fixed left-4 top-4 z-50 flex size-11 items-center justify-center rounded-xl border bg-background shadow-md lg:hidden"
+        aria-label="เปิดเมนู"
+      >
+        <Menu className="size-5" />
+      </button>
+
+      {/* =========================================
+          MOBILE OVERLAY
+      ========================================= */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 lg:hidden"
+          onClick={() =>
+            setMobileOpen(false)
+          }
+        />
       )}
-    >
-      <SidebarLogo collapsed={collapsed} />
 
-      <SidebarNav
-        role={role}
-        collapsed={collapsed}
-        activeKey={activeKey}
-        onNavigate={onNavigate}
-      />
+      {/* =========================================
+          MOBILE SIDEBAR
+      ========================================= */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-[60] flex w-[280px] flex-col bg-sidebar shadow-xl transition-transform duration-300 lg:hidden",
+          mobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full",
+        )}
+      >
+        {/* Mobile Header */}
+        <div className="flex h-[72px] items-center justify-between border-b border-sidebar-border">
+          <SidebarLogo />
 
-      <SidebarFooter collapsed={collapsed} />
-    </aside>
+          <button
+            type="button"
+            onClick={() =>
+              setMobileOpen(false)
+            }
+            className="mr-4 flex size-10 items-center justify-center rounded-lg hover:bg-accent"
+            aria-label="ปิดเมนู"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
+        <SidebarNav
+          role={role}
+          activeKey={activeKey}
+          onNavigate={(key) => {
+            onNavigate?.(key);
+            setMobileOpen(false);
+          }}
+        />
+
+        <SidebarFooter />
+      </aside>
+    </>
   );
 }
 
-export function SidebarMobileContent({ activeKey, onNavigate }: SidebarProps) {
+export function SidebarMobileContent({
+  activeKey,
+  onNavigate,
+  role,
+}: SidebarProps) {
   return (
     <div className="flex h-full flex-col bg-sidebar">
       <SidebarLogo />
 
-      <SidebarNav activeKey={activeKey} onNavigate={onNavigate} />
+      <SidebarNav
+        role={role}
+        activeKey={activeKey}
+        onNavigate={onNavigate}
+      />
 
       <SidebarFooter />
     </div>

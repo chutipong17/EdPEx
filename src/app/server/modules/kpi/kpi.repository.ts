@@ -49,6 +49,9 @@ export class KpiRepository {
             },
           },
         },
+        orderBy: {
+          updatedAt: "desc",
+        },
       });
 
       const data = kpi.map((kpiItem) => {

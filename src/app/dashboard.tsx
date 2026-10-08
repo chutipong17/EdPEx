@@ -64,61 +64,81 @@
 //     </DashboardLayout>
 //   )
 // }
-
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { DashboardFilters } from "@/components/dashboard/dashboard-filters";
 import { DashboardData } from "@/components/dashboard/DashboardData";
-
 import { redirect } from "next/navigation";
+
 import { auth } from "@/lib/auth";
 
-/* =====================================================
-   Filter Options
-   ===================================================== */
-
-const yearOptions = [
-  { label: "ทั้งหมด", value: "all" },
-  { label: "2570", value: "2570" },
-  { label: "2569", value: "2569" },
-  { label: "2568", value: "2568" },
-  { label: "2567", value: "2567" },
-  { label: "2566", value: "2566" },
-];
-
-const indicatorTypeOptions = [
-  { label: "ทั้งหมด", value: "all" },
-  { label: "ตัวชี้วัด กลยุทธ์", value: "3" },
-  { label: "ตัวชี้วัดเชิงยุทธศาสตร์", value: "strategic" },
-  { label: "ตัวชี้วัดเชิงปฏิบัติการ", value: "operational" },
-  { label: "ตัวชี้วัดคุณภาพ", value: "quality" },
-];
-
-const departmentOptions = [
-  { label: "ทั้งหมด", value: "all" },
-];
-
-const branchOptions = [
-  { label: "ทั้งหมด", value: "all" },
-];
+import type { FilterOption } from "@/types/dashboard";
 
 /* =====================================================
-   Dashboard Page
-   ===================================================== */
+   Year Options
+===================================================== */
+const currentYear = new Date().getFullYear() + 543;
+
+const yearOptions: FilterOption[] = [
+  {
+    label: String(currentYear),
+    value: String(currentYear),
+  },
+
+  // ย้อนหลัง 3 ปี
+  ...Array.from({ length: 3 }, (_, index) => {
+    const year = currentYear - (index + 1);
+
+    return {
+      label: String(year),
+      value: String(year),
+    };
+  }),
+
+  // อนาคต 4 ปี
+  ...Array.from({ length: 4 }, (_, index) => {
+    const year = currentYear + (index + 1);
+
+    return {
+      label: String(year),
+      value: String(year),
+    };
+  }),
+];
+/* =====================================================
+   Branch Options
+===================================================== */
+
+const branchOptions: FilterOption[] = [
+  {
+    label: "ทั้งหมด",
+    value: "all",
+  },
+];
+
+/* =====================================================
+   Page
+===================================================== */
 
 export default async function DashboardPage() {
+  /* =====================================================
+     Auth
+  ===================================================== */
+
   const session = await auth();
 
   if (!session) {
     redirect("/login");
   }
 
+  /* =====================================================
+     Render
+  ===================================================== */
+
   return (
     <DashboardLayout user={session.user}>
       <div className="flex flex-col gap-6">
-
-        {/* =====================================================
-            Page Header
-        ===================================================== */}
+        {/* =================================================
+            Header
+        ================================================= */}
 
         <header>
           <h1 className="text-balance text-3xl font-semibold text-foreground">
@@ -130,26 +150,14 @@ export default async function DashboardPage() {
           </p>
         </header>
 
-        {/* =====================================================
-            Filters
-        ===================================================== */}
-
-        <DashboardFilters
-          yearOptions={yearOptions}
-          indicatorTypeOptions={indicatorTypeOptions}
-          departmentOptions={departmentOptions}
-          branchOptions={branchOptions}
-        />
-
-        {/* =====================================================
-            API Dashboard Data
-        ===================================================== */}
+        {/* =================================================
+            Dashboard Data
+        ================================================= */}
 
         <DashboardData
           yearOptions={yearOptions}
-          indicatorTypeOptions={indicatorTypeOptions}
+          branchOptions={branchOptions}
         />
-
       </div>
     </DashboardLayout>
   );

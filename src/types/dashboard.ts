@@ -15,9 +15,49 @@ export interface Indicator {
   unit: string;
   result: number | null;
   status: IndicatorStatus;
-  kpiSubmissionStatus?: string | null
+
+  kpiSubmissionStatus?: string | null;
+
+  kpiAssignment?: KpiAssignment[];
 }
 
+export interface KpiAssignment {
+  id: number;
+  userId: number;
+  kpiId: number;
+  assignedDate: string;
+  dueDate: string | null;
+  createdAt: string;
+  createdBy: string;
+  isDeleted: boolean;
+
+  kpiSubmission?: KpiSubmission[];
+}
+
+export interface KpiSubmission {
+  id: number;
+  kpiAssignmentId: number;
+  statusId: number;
+
+  submittedBy: string | null;
+  achievementPercent: number | null;
+  actualValue: string | null;
+  calculatedScore: number | null;
+
+  createdAt: string;
+  description: string | null;
+  isDeleted: boolean;
+
+  submittedDate: string | null;
+  updatedAt: string;
+  updatedBy: string | null;
+
+  status?: {
+    id: number;
+    name: string;
+    description: string;
+  };
+}
 export interface KpiSummary {
   total: number;
   achieved: number;
@@ -45,8 +85,8 @@ export interface FilterOption {
 }
 
 export interface DashboardFilters {
-  year: string;
-  indicatorType: string;
-  department: string;
+  year: number | null;
+  indicatorType: number | null;
+  departmentName: number | null;
   branch: string;
 }

@@ -72,7 +72,7 @@ export function IndicatorForm({ mode, id, initialValues, title }: IndicatorFormP
       kpiComparison,
     };
 
-    console.log("Indicator form submitted: ", payload);
+    // console.log("Indicator form submitted: ", payload);
 
     try {
       if (mode === "create") {

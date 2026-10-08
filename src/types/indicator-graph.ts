@@ -1,32 +1,35 @@
-
 export interface IndicatorDataPoint {
-  year: string
-  ubru: number
-  target: number
-  q1: number
-  q2: number
+  year: string;
+  target: number | null;
+
+  /**
+   * key จะมาจาก kpiComparison.name
+   * เช่น
+   * KKU: 80
+   * UUU: 70
+   */
+  [key: string]: string | number | null;
 }
 
-export type IndicatorCategory =
-  | "7.1"
-  | "7.2"
-  | "7.3"
-  | "7.4"
-  | "7.5"
-
 export interface IndicatorGraph {
-  id: string
-  /** e.g. "ตัวชี้วัด 7.1(1)-01" */
-  code: string
-  /** Short description shown under the code */
-  description: string
-  category: IndicatorCategory
-  data: IndicatorDataPoint[]
+  id: string;
+
+  /** เช่น 7.ก */
+  code: string;
+
+  /** ชื่อตัวชี้วัด */
+  description: string;
+
+  /** id ของประเภทตัวชี้วัด */
+  category: string;
+
+  /** ข้อมูลสำหรับแสดงกราฟ */
+  data: IndicatorDataPoint[];
 }
 
 export interface FilterState {
-  year: string | null
-  category: string | null
-  chartType: string | null
-  search: string | null
+  year: string | null;
+  category: string | null;
+  chartType: string | null;
+  search: string | null;
 }

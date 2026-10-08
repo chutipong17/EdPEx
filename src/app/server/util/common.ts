@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { ConditionName } from "../enum/enum";
 
 /**
  * Recursively converts BigInt values to strings in an object or array.
@@ -139,4 +140,10 @@ export function buildUpdateData<T>(value: T | undefined): { set: T } | undefined
 export function toDecimalUpdate(value: number | null | undefined) {
   if (value === undefined) return undefined;
   return { set: value === null ? null : new Prisma.Decimal(value) };
+}
+
+export function getConditionName(value: string): string | undefined {
+  return Object.keys(ConditionName).find(
+    key => ConditionName[key as keyof typeof ConditionName] === value
+  );
 }

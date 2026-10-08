@@ -6,19 +6,19 @@ const now = new Date().toISOString()
 export const mockDepartments: Department[] = [
   {
     id: 1,
-    name: 'งานแผนยุทธศาสตร์',
+    departmentName: 'งานแผนยุทธศาสตร์',
     createdAt: now,
     updatedAt: now,
   },
   {
     id: 2,
-    name: 'สำนักวิชาการ',
+    departmentName: 'สำนักวิชาการ',
     createdAt: now,
     updatedAt: now,
   },
   {
     id: 3,
-    name: 'กองกลาง',
+    departmentName: 'กองกลาง',
     createdAt: now,
     updatedAt: now,
   },

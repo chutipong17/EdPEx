@@ -6,7 +6,7 @@ import { KpiSubmissionDto } from "../../dto/kpi-submission.dto";
 import { KpiDto } from "../../dto/kpi.dto";
 import { KpiByDepartmentResponse, KpiWithUserAndDept } from "../../dto/shared-includes";
 import { ConditionName, KpiStatus, KpiSubmissionStatus } from "../../enum/enum";
-import { buildUpdateData, toDecimalUpdate } from "../../util/common";
+import { buildUpdateData, getConditionName, toDecimalUpdate } from "../../util/common";
 import { evaluateTargetCondition } from "../../util/target-condition";
 import { KpiRepository } from "./kpi.repository";
 
@@ -228,17 +228,18 @@ export class KpiService {
         updatedAt: now,
       })) ?? [];
 
-      const kpiUpdated = await this.prisma.$transaction(
+      await this.prisma.$transaction(
         async (tx) => {
           await this.kpiRepository.updateKpiTransaction(tx, kpiData, id);
           await this.kpiRepository.replaceKpiComparisons(tx, id, kpiComparisonData);
-          return this.kpiRepository.getKpiById(id);
         },
         {
-          timeout: 10000,
-          maxWait: 2000,
+          timeout: 30000,
+          maxWait: 5000,
         },
       );
+
+      const kpiUpdated = await this.kpiRepository.getKpiById(id);
 
       return kpiUpdated;
     } catch (error) {
@@ -328,11 +329,7 @@ export class KpiService {
 
     const target = Number(kpiItem.targetValue ?? 0);
     const value = Number(latestSubmission.actualValue ?? 0);
-
-    const condition =
-      ConditionName[
-        kpiItem.targetCondition.conditionName as keyof typeof ConditionName
-      ];
+    const condition = kpiItem.targetCondition.conditionName as ConditionName;
 
     const achievedTarget = evaluateTargetCondition(
       value,

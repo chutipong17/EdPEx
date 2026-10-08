@@ -104,6 +104,9 @@ export const useUpdateKpi = () => {
         await axiosInstance.patch(
           `${API_ENDPOINT.KPI.UPDATE(id)}`,
           body,
+          {
+            timeout: 30000,
+          },
         );
 
       return response.data;
