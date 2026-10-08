@@ -1,39 +1,76 @@
 import { NextResponse } from 'next/server'
-import { mockDepartments } from '@/lib/mock-department'
+
 import { departmentSchema } from '@/lib/department-schema'
+
+const API_URL = process.env.API_URL
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
+
   const departmentId = Number(id)
-  const index = mockDepartments.findIndex((dept) => dept.id === departmentId)
 
-  if (index === -1) {
+  if (Number.isNaN(departmentId)) {
     return NextResponse.json(
-      { message: 'ไม่พบหน่วยงานที่ต้องการแก้ไข' },
-      { status: 404 },
-    )
-  }
-
-  const body = await request.json().catch(() => null)
-  const parsed = departmentSchema.safeParse(body)
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { message: parsed.error.issues[0]?.message ?? 'ข้อมูลไม่ถูกต้อง' },
+      { message: 'รหัสหน่วยงานไม่ถูกต้อง' },
       { status: 400 },
     )
   }
 
-  mockDepartments[index] = {
-    ...mockDepartments[index],
-    name: parsed.data.name,
-    updatedAt: new Date().toISOString(),
+  const body = await request.json().catch(() => null)
+
+  const parsed = departmentSchema.safeParse(body)
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        message:
+          parsed.error.issues[0]?.message ?? 'ข้อมูลไม่ถูกต้อง',
+      },
+      { status: 400 },
+    )
   }
 
-  return NextResponse.json(mockDepartments[index])
+  try {
+    const response = await fetch(
+      `${API_URL}/api/departments/${departmentId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parsed.data),
+        cache: 'no-store',
+      },
+    )
+
+    const data = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          message:
+            data?.message ?? 'ไม่สามารถแก้ไขหน่วยงานได้',
+        },
+        { status: response.status },
+      )
+    }
+
+    return NextResponse.json(data, {
+      status: response.status,
+    })
+  } catch (error) {
+    console.error('Update department error:', error)
+
+    return NextResponse.json(
+      {
+        message: 'ไม่สามารถเชื่อมต่อ API ได้',
+      },
+      { status: 500 },
+    )
+  }
 }
 
 export async function DELETE(
@@ -41,17 +78,48 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const departmentId = Number(id)
-  const index = mockDepartments.findIndex((dept) => dept.id === departmentId)
 
-  if (index === -1) {
+  const departmentId = Number(id)
+
+  if (Number.isNaN(departmentId)) {
     return NextResponse.json(
-      { message: 'ไม่พบหน่วยงานที่ต้องการลบ' },
-      { status: 404 },
+      { message: 'รหัสหน่วยงานไม่ถูกต้อง' },
+      { status: 400 },
     )
   }
 
-  const [removed] = mockDepartments.splice(index, 1)
+  try {
+    const response = await fetch(
+      `${API_URL}/api/departments/${departmentId}`,
+      {
+        method: 'DELETE',
+        cache: 'no-store',
+      },
+    )
 
-  return NextResponse.json(removed)
+    const data = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          message:
+            data?.message ?? 'ไม่สามารถลบหน่วยงานได้',
+        },
+        { status: response.status },
+      )
+    }
+
+    return NextResponse.json(data, {
+      status: response.status,
+    })
+  } catch (error) {
+    console.error('Delete department error:', error)
+
+    return NextResponse.json(
+      {
+        message: 'ไม่สามารถเชื่อมต่อ API ได้',
+      },
+      { status: 500 },
+    )
+  }
 }

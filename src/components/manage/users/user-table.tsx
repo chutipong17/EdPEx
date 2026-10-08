@@ -104,7 +104,7 @@ export function UserTable({
                 {user.email}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {user.department}
+                {user.departmentName}
               </TableCell>
               <TableCell className="font-mono text-sm text-muted-foreground">
                 {user.mobileNumber}
